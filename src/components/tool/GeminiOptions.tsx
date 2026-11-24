@@ -96,6 +96,12 @@ export function GeminiOptions({ files, toolSlug }: { files: File[]; toolSlug: st
         const { data: guestData, error: guestError } = await supabase.auth.signInAnonymously()
         if (guestError) {
           console.error('Could not create a guest AI session.', guestError)
+          if (guestError.code === 'anonymous_provider_disabled') {
+            throw new Error(tr(
+              'Guest AI is disabled in this Supabase project. Enable Anonymous Sign-Ins in Supabase Authentication settings, or sign in with an account.',
+              'اس Supabase پروجیکٹ میں مہمان AI بند ہے۔ Supabase Authentication settings میں Anonymous Sign-Ins فعال کریں یا اپنے اکاؤنٹ سے سائن اِن کریں۔',
+            ))
+          }
           throw new Error(tr('Guest AI access is unavailable right now. Please try again later.', 'مہمان AI رسائی فی الحال دستیاب نہیں۔ براہِ کرم بعد میں دوبارہ کوشش کریں۔'))
         }
         session = guestData.session

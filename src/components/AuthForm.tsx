@@ -35,8 +35,10 @@ export function AuthForm({
   onSuccess?: () => void
 }) {
   const { tr } = useI18n()
+  const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
@@ -45,9 +47,13 @@ export function AuthForm({
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setBusy(true)
     setMessage('')
     setError('')
+    if (mode === 'signup' && password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+    setBusy(true)
     try {
       const supabase = getSupabase()
       const origin = window.location.origin
@@ -56,13 +62,16 @@ export function AuthForm({
         if (sessionError) throw sessionError
         const { error: authError } = sessionData.session?.user.is_anonymous
           ? await supabase.auth.updateUser(
-              { email, password },
+              { email, password, data: { name: fullName.trim() } },
               { emailRedirectTo: `${origin}/dashboard` },
             )
           : await supabase.auth.signUp({
               email,
               password,
-              options: { emailRedirectTo: `${origin}/dashboard` },
+              options: {
+                data: { name: fullName.trim() },
+                emailRedirectTo: `${origin}/dashboard`,
+              },
             })
         if (authError) throw authError
         setMessage('Check your email for the verification link to finish creating your account.')
@@ -92,6 +101,15 @@ export function AuthForm({
     setError('')
     try {
       const supabase = getSupabase()
+      const settingsResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/auth/v1/settings`, {
+        headers: { apikey: import.meta.env.VITE_SUPABASE_ANON_KEY },
+      })
+      if (!settingsResponse.ok)
+        throw new Error('Could not verify Google sign-in settings. Try signing in with email instead.')
+      const settings = await settingsResponse.json() as { external?: { google?: boolean } }
+      if (settings.external?.google === false)
+        throw new Error('Google sign-in is not enabled for this project. Use email, or enable Google under Supabase Authentication settings.')
+
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
       if (sessionError) throw sessionError
       const options = { redirectTo: `${window.location.origin}/dashboard` }
@@ -152,6 +170,22 @@ export function AuthForm({
       )}
 
       <form className={compact ? 'space-y-3' : 'space-y-5'} onSubmit={submit}>
+        {mode === 'signup' && (
+          <label htmlFor="auth-name" className="block space-y-2 text-sm font-semibold">
+            <span>Full name</span>
+            <input
+              id="auth-name"
+              className="min-h-12 w-full rounded-xl border border-line bg-paper px-4 font-normal outline-none transition placeholder:text-muted/70 focus:border-accent focus:ring-4 focus:ring-accent/10"
+              type="text"
+              autoComplete="name"
+              maxLength={100}
+              placeholder="Your name"
+              required
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+            />
+          </label>
+        )}
         {mode !== 'reset' && (
           <label htmlFor="auth-email" className="block space-y-2 text-sm font-semibold">
             <span>Email address</span>
@@ -194,6 +228,21 @@ export function AuthForm({
             {(mode === 'signup' || mode === 'reset') && (
               <span id="auth-password-hint" className="block text-xs font-normal text-muted">Use at least 8 characters.</span>
             )}
+          </label>
+        )}
+        {mode === 'signup' && (
+          <label htmlFor="auth-confirm-password" className="block space-y-2 text-sm font-semibold">
+            <span>Confirm password</span>
+            <input
+              id="auth-confirm-password"
+              className="min-h-12 w-full rounded-xl border border-line bg-paper px-4 font-normal outline-none transition placeholder:text-muted/70 focus:border-accent focus:ring-4 focus:ring-accent/10"
+              type="password"
+              autoComplete="new-password"
+              minLength={8}
+              required
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+            />
           </label>
         )}
         {error && <p role="alert" className="rounded-xl bg-blush px-3 py-2 text-sm font-medium text-accent-dark">{error}</p>}
