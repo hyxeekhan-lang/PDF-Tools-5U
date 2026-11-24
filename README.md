@@ -1,5 +1,7 @@
 # PDF Pilot 5U
 
+![PDF Pilot 5U homepage](./screenshots/homepage.png)
+
 PDF Pilot 5U is a browser-first PDF workspace built with TanStack Start, React, TypeScript, PDF.js and pdf-lib.
 Local PDF tools process files in the browser. Optional AI tools require explicit consent before extracted text is sent
 to Google Gemini; a registered account is not required. Account data and anonymous AI sessions are handled by Supabase.
