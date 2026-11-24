@@ -1,13 +1,13 @@
 import { useI18n } from '#/lib/i18n'
-import { CATEGORIES, TOOLS } from '#/lib/tools'
+import { CATEGORIES, LISTED_TOOLS } from '#/lib/tools'
 import { ToolCard } from './ToolCard'
 
 export function AllTools() {
   const { t } = useI18n()
   return (
     <div className="space-y-14">
-      {CATEGORIES.map((cat) => {
-        const tools = TOOLS.filter((x) => x.category === cat)
+      {CATEGORIES.filter((cat) => LISTED_TOOLS.some((tool) => tool.category === cat)).map((cat) => {
+        const tools = LISTED_TOOLS.filter((x) => x.category === cat)
         return (
           <div key={cat} id={`cat-${cat}`}>
             <div data-reveal className="mb-5 flex items-baseline gap-3 border-b border-line pb-3">

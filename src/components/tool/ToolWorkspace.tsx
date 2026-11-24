@@ -5,37 +5,126 @@ import { useI18n } from '#/lib/i18n'
 import { type Bilingual, type Output, ToolError, downloadBlob, formatBytes, validateFile, zipOutputs } from '#/lib/pdf'
 import type { Tool } from '#/lib/tools'
 import { DropFrame } from '../DropFrame'
+import { recordProcessing } from '#/lib/supabase'
 import { SignOptions } from './SignOptions'
+import { GeminiOptions } from './GeminiOptions'
 import {
   CompressOptions,
+  AddTextOptions,
+  AddImageOptions,
+  BatchOptions,
+  CompareOptions,
+  CropOptions,
   DeleteOptions,
+  DuplicateOptions,
   ExtractOptions,
+  EditMetadataOptions,
+  HeaderFooterOptions,
+  FlattenOptions,
   type Job,
   JpgToPdfOptions,
   MergeOptions,
   type OptionsProps,
   PageNumberOptions,
+  PdfToTextOptions,
+  RepairOptions,
+  OcrOptions,
   PdfToJpgOptions,
+  PdfToPngOptions,
+  PdfToPowerPointOptions,
+  PdfToHtmlOptions,
+  PdfToJsonOptions,
+  PdfToMarkdownOptions,
+  MetadataOptions,
+  OptimizeOptions,
   ReorderOptions,
+  RemoveMetadataOptions,
   RotateOptions,
   type RunOptions,
   SplitOptions,
+  TextToPdfOptions,
+  WordToPdfOptions,
+  ExcelToPdfOptions,
+  ExtractImagesOptions,
+  PowerPointToPdfOptions,
+  HtmlToPdfOptions,
+  HeicToPdfOptions,
+  HighlightOptions,
+  AnnotateOptions,
+  DrawOptions,
+  RedactOptions,
+  ProtectOptions,
+  UnlockOptions,
+  PdfToCsvOptions,
+  PdfToExcelOptions,
+  PdfToWordOptions,
   WatermarkOptions,
 } from './options'
+
+const aiOptions = (toolSlug: string) => (props: OptionsProps) => <GeminiOptions files={props.files} toolSlug={toolSlug} />
 
 const OPTIONS: Record<string, (p: OptionsProps) => React.ReactNode> = {
   'merge-pdf': MergeOptions,
   'split-pdf': SplitOptions,
   'rotate-pdf': RotateOptions,
   'delete-pages': DeleteOptions,
+  'remove-pages': DeleteOptions,
   'extract-pages': ExtractOptions,
+  'duplicate-pages': DuplicateOptions,
   'reorder-pages': ReorderOptions,
+  'organize-pages': ReorderOptions,
+  'rearrange-pages': ReorderOptions,
   'add-page-numbers': PageNumberOptions,
   'add-watermark': WatermarkOptions,
   'sign-pdf': SignOptions,
   'jpg-to-pdf': JpgToPdfOptions,
+  'png-to-pdf': JpgToPdfOptions,
   'pdf-to-jpg': PdfToJpgOptions,
+  'pdf-to-text': PdfToTextOptions,
+  'pdf-to-png': PdfToPngOptions,
+  'pdf-to-powerpoint': PdfToPowerPointOptions,
+  'pdf-to-html': PdfToHtmlOptions,
+  'extract-images': ExtractImagesOptions,
+  'chat-with-pdf': aiOptions('chat-with-pdf'),
+  'ai-pdf-summarizer': aiOptions('ai-pdf-summarizer'),
+  'ai-document-qa': aiOptions('ai-document-qa'),
+  'ai-document-translator': aiOptions('ai-document-translator'),
+  'ai-key-points': aiOptions('ai-key-points'),
+  'ai-report-generator': aiOptions('ai-report-generator'),
+  'pdf-translator': aiOptions('pdf-translator'),
+  'pdf-to-markdown': PdfToMarkdownOptions,
+  'pdf-to-json': PdfToJsonOptions,
+  'pdf-to-csv': PdfToCsvOptions,
+  'extract-tables': PdfToCsvOptions,
+  'extract-metadata': MetadataOptions,
+  'flatten-pdf': FlattenOptions,
+  'optimize-pdf': OptimizeOptions,
   'compress-pdf': CompressOptions,
+  'remove-metadata': RemoveMetadataOptions,
+  'add-text': AddTextOptions,
+  'header-footer': HeaderFooterOptions,
+  'crop-pdf': CropOptions,
+  'pdf-compare': CompareOptions,
+  'txt-to-pdf': TextToPdfOptions,
+  'word-to-pdf': WordToPdfOptions,
+  'excel-to-pdf': ExcelToPdfOptions,
+  'powerpoint-to-pdf': PowerPointToPdfOptions,
+  'html-to-pdf': HtmlToPdfOptions,
+  'heic-to-pdf': HeicToPdfOptions,
+  'pdf-to-word': PdfToWordOptions,
+  'pdf-to-excel': PdfToExcelOptions,
+  'add-images': AddImageOptions,
+  'pdf-page-editor': ReorderOptions,
+  'pdf-metadata': EditMetadataOptions,
+  'batch-processing': BatchOptions,
+  'repair-pdf': RepairOptions,
+  'pdf-ocr': OcrOptions,
+  'highlight-pdf': HighlightOptions,
+  'annotate-pdf': AnnotateOptions,
+  'draw-pdf': DrawOptions,
+  'redact-pdf': RedactOptions,
+  'protect-pdf': ProtectOptions,
+  'unlock-pdf': UnlockOptions,
 }
 
 type State =
@@ -50,7 +139,21 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
   const [state, setState] = useState<State>({ phase: 'edit' })
   const [dragging, setDragging] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const accept = tool.accepts === 'pdf' ? 'application/pdf,.pdf' : 'image/jpeg,image/png,.jpg,.jpeg,.png'
+  const accept = tool.accepts === 'pdf'
+    ? 'application/pdf,.pdf'
+    : tool.accepts === 'image'
+      ? 'image/jpeg,image/png,.jpg,.jpeg,.png'
+      : tool.accepts === 'heic'
+        ? 'image/heic,image/heif,.heic,.heif'
+      : tool.accepts === 'text'
+        ? 'text/plain,.txt'
+        : tool.accepts === 'html'
+          ? 'text/html,.html,.htm'
+          : tool.accepts === 'docx'
+            ? '.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            : tool.accepts === 'xlsx'
+              ? '.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+              : '.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation'
 
   const addFiles = useCallback(
     async (incoming: File[]) => {
@@ -94,6 +197,17 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
         }
         const toSave = outputs.length > 5 ? [await zipOutputs(outputs, `${tool.slug}-results.zip`)] : outputs
         const saved = await saveFiles(toSave, tool.slug)
+        try {
+          await recordProcessing({
+            operation: tool.slug,
+            inputCount: files.length,
+            outputCount: outputs.length,
+            outputBytes: outputs.reduce((total, output) => total + output.blob.size, 0),
+          })
+        } catch (historyError) {
+          console.error('Could not save processing history.', historyError)
+          setErrors([{ en: 'The file was processed, but account history could not be saved. You can still download your result.', ur: 'فائل تیار ہو گئی، مگر اکاؤنٹ ہسٹری محفوظ نہیں ہوئی۔ نتیجہ ڈاؤن لوڈ کر سکتے ہیں۔' }])
+        }
         setState({ phase: 'done', outputs, compareSize: opts.compareSize, saved })
       } catch (e) {
         console.error(e)
@@ -108,7 +222,7 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
         setState({ phase: 'edit' })
       }
     },
-    [tool.slug],
+    [files.length, tool.slug],
   )
 
   const reset = () => {
@@ -127,7 +241,7 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
     })
 
   const Options = OPTIONS[tool.slug]
-  const FileIcon = tool.accepts === 'pdf' ? FileText : ImageIcon
+  const FileIcon = tool.accepts === 'image' || tool.accepts === 'heic' ? ImageIcon : FileText
 
   const picker = (
     <input
@@ -163,7 +277,10 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
           <div>
             <h2 className="font-display text-xl font-bold">{state.outputs.length > 1 ? t('page.doneMany') : t('page.done')}</h2>
             <p className="mt-1 text-sm text-muted">
-              {t('page.localNote')} {state.saved && t('page.savedToMyFiles')}
+              {tool.category === 'ai' || tool.slug === 'pdf-translator'
+                ? tr('AI output is based on text sent to Gemini with your consent. Downloaded to this device.', 'AI جواب آپ کی اجازت سے Gemini کو بھیجے گئے متن سے بنا ہے اور اس آلے پر ڈاؤن لوڈ ہوتا ہے۔')
+                : t('page.localNote')}{' '}
+              {state.saved && t('page.savedToMyFiles')}
             </p>
           </div>
         </div>
@@ -204,10 +321,11 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
               <button
                 type="button"
                 onClick={() => downloadBlob(o)}
-                className="press inline-flex min-h-10 items-center gap-1.5 rounded-full bg-accent px-4 text-sm font-semibold text-white hover:bg-accent-dark hover:shadow-md"
+                aria-label={tool.slug === 'pdf-to-word' ? `Download ${o.name} as a Word document` : `Download ${o.name}`}
+                className="press inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full bg-accent px-3 text-xs font-semibold text-white hover:bg-accent-dark hover:shadow-md sm:px-4 sm:text-sm"
               >
                 <Download className="size-4" />
-                {t('page.download')}
+                {tool.slug === 'pdf-to-word' ? tr('Download DOCX', 'DOCX ڈاؤن لوڈ') : t('page.download')}
               </button>
             </li>
           ))}
@@ -266,7 +384,7 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
           </span>
           <p className="mt-5 font-display text-xl font-bold">{tool.multiple ? t('page.dropHereMany') : t('page.dropHere')}</p>
           <p className="mt-1 text-sm text-muted">
-            {tool.accepts === 'pdf' ? 'PDF' : 'JPG, PNG'} · {t('page.limit')}
+            {tool.accepts === 'pdf' ? 'PDF' : tool.accepts === 'image' ? 'JPG, PNG' : tool.accepts === 'heic' ? 'HEIC, HEIF' : tool.accepts === 'text' ? 'TXT' : tool.accepts === 'html' ? 'HTML' : tool.accepts.toUpperCase()} · {t('page.limit')}
           </p>
           <button
             type="button"
@@ -277,7 +395,9 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
           </button>
           <p className="mt-5 flex items-center justify-center gap-1.5 text-xs text-muted">
             <ShieldCheck className="size-4 shrink-0 text-accent" />
-            {t('page.localNote')}
+            {tool.category === 'ai' || tool.slug === 'pdf-translator'
+              ? tr('Your PDF stays on this device. Extracted text is sent to Gemini only after consent.', 'PDF آپ کے آلے پر رہتی ہے۔ اجازت کے بعد صرف نکالا ہوا متن Gemini کو بھیجا جاتا ہے۔')
+              : t('page.localNote')}
           </p>
         </div>
         {errorList}

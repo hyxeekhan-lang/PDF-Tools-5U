@@ -10,14 +10,15 @@ import { POPULAR, getTool } from '#/lib/tools'
 export const Route = createFileRoute('/')({
   staticData: { pageId: 'pg_hM1qXe5rTz8C', funnel: { next: [] } },
   head: () => ({
+    links: import.meta.env.VITE_PUBLIC_SITE_URL ? [{ rel: 'canonical', href: new URL('/', import.meta.env.VITE_PUBLIC_SITE_URL).toString() }] : [],
     meta: [
-      { title: 'PDFTools — Free PDF tools that run in your browser' },
+      { title: 'PDF Pilot 5U — Everything you need to work with PDFs' },
       {
         name: 'description',
-        content: 'Compress, merge, split, sign and convert PDFs for free. Files are processed in your browser and never uploaded.',
+        content: 'Merge, compress, split, sign, convert and edit PDFs in your browser. Optional AI tools send extracted text to Google only after consent; signing in is optional.',
       },
-      { property: 'og:title', content: 'PDFTools — PDFs, made simple. Free.' },
-      { property: 'og:description', content: 'Free PDF tools that run in your browser. Your files never leave your device.' },
+      { property: 'og:title', content: 'PDF Pilot 5U — Everything you need to work with PDFs' },
+      { property: 'og:description', content: 'Free PDF tools that run in your browser, with optional AI tools and clear consent before text is sent to Google.' },
     ],
   }),
   component: Home,
@@ -87,9 +88,9 @@ function Hero() {
                   to="/tools/$slug"
                   params={{ slug }}
                   style={stagger(500 + i * 60)}
-                  className="animate-fade-up press group inline-flex min-h-10 items-center gap-2 rounded-full border border-line bg-card px-4 text-sm font-semibold hover:border-accent/50 hover:text-accent hover:shadow-[var(--shadow-soft)]"
+                  className="animate-fade-up press group inline-flex min-h-10 items-center gap-2 rounded-full border border-line bg-card px-4 text-sm font-semibold hover:border-ink/15 hover:text-ink hover:shadow-[var(--shadow-soft)]"
                 >
-                  <Icon className="size-4 text-accent transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110" />
+                  <Icon className="size-4 text-muted transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110" />
                   {pick(tool.name)}
                 </Link>
               )
@@ -269,11 +270,11 @@ function Faq() {
           {t('faq.title')}
         </h2>
         <div className="mt-8 divide-y divide-line border-y border-line">
-          {[1, 2, 3, 4, 5, 6].map((n, i) => (
+          {[1, 2, 3, 4, 5, 6, 7].map((n, i) => (
             <details key={n} data-reveal style={stagger(i * 60)} className="group py-5">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-semibold">
                 {t(`faq.${n}.q` as TKey)}
-                <span className="text-2xl text-muted transition duration-300 group-open:rotate-45 group-open:text-accent" aria-hidden>
+                <span className="text-2xl text-muted transition duration-300 group-open:rotate-45 group-open:text-ink" aria-hidden>
                   +
                 </span>
               </summary>

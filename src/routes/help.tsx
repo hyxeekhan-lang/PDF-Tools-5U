@@ -5,9 +5,12 @@ import { useI18n } from '#/lib/i18n'
 export const Route = createFileRoute('/help')({
   staticData: { pageId: 'pg_hL3cVb6nYs0R', funnel: { next: [] } },
   head: () => ({
+    links: import.meta.env.VITE_PUBLIC_SITE_URL
+      ? [{ rel: 'canonical', href: new URL('/help', import.meta.env.VITE_PUBLIC_SITE_URL).toString() }]
+      : [],
     meta: [
-      { title: 'Help Center — PDFTools' },
-      { name: 'description', content: 'Answers to common questions about using PDFTools in your browser.' },
+      { title: 'Help Center — PDF Pilot 5U' },
+      { name: 'description', content: 'Answers to common questions about using PDF Pilot 5U in your browser.' },
     ],
   }),
   component: Help,
@@ -16,11 +19,11 @@ export const Route = createFileRoute('/help')({
 const TOPICS = [
   {
     q: 'A tool says my file is not a valid PDF',
-    a: 'PDFTools checks both the file type and the first bytes of the file, which must start with “%PDF”. Files renamed to .pdf, or downloads that were cut short, fail this check. Try opening the file in a PDF viewer and saving a fresh copy.',
+    a: 'PDF Pilot 5U checks both the file type and the first bytes of the file, which must start with “%PDF”. Files renamed to .pdf, or downloads that were cut short, fail this check. Try opening the file in a PDF viewer and saving a fresh copy.',
   },
   {
     q: 'A tool says my PDF is password-protected',
-    a: 'Encrypted PDFs aren’t supported yet. If you own the file, open it in your PDF viewer with the password and save or print a copy without protection, then try again.',
+    a: 'Use Unlock PDF with the password you already know, then process the unlocked copy. PDF Pilot 5U does not guess, crack or bypass unknown passwords.',
   },
   {
     q: 'Processing is slow or the tab crashes',
@@ -38,12 +41,20 @@ const TOPICS = [
     q: 'Is a signature from Sign PDF legally binding?',
     a: 'Sign PDF adds a visible image of your signature. It is not a certificate-based digital signature. Whether that is enough depends on the document and where you are; check with the person asking for the signature.',
   },
+  {
+    q: 'Does PDF Pilot 5U upload my documents?',
+    a: 'Local PDF tools process files in your browser. If you choose an AI tool, selectable text is sent to Google Gemini only after you explicitly consent; the source PDF is not uploaded. A guest Supabase session may be created automatically, but a registered account is not required. Avoid sending confidential material to AI services.',
+  },
+  {
+    q: 'Why can’t I find PDF/A or a certificate-backed signature?',
+    a: 'PDF/A conversion and certificate-backed digital signatures need specialized engines or credentials that are not configured, so they remain hidden until verified.',
+  },
 ]
 
 function Help() {
   const { t } = useI18n()
   return (
-    <PageShell eyebrow={t('footer.help')} title="How can we help?" intro="Common questions about using PDFTools.">
+    <PageShell eyebrow={t('footer.help')} title="How can we help?" intro="Common questions about using PDF Pilot 5U.">
       <div className="divide-y divide-line border-y border-line">
         {TOPICS.map((item) => (
           <details key={item.q} className="group py-5">

@@ -1,0 +1,18 @@
+{
+  "buildCommand": "npm run build && node scripts/prerender.mjs",
+  "outputDirectory": "dist/client",
+  "redirects": [
+    { "source": "/tools/remove-pages", "destination": "/tools/delete-pages", "permanent": true },
+    { "source": "/tools/organize-pages", "destination": "/tools/reorder-pages", "permanent": true },
+    { "source": "/tools/rearrange-pages", "destination": "/tools/reorder-pages", "permanent": true },
+    { "source": "/tools/pdf-page-editor", "destination": "/tools/reorder-pages", "permanent": true },
+    { "source": "/tools/pdf-to-csv", "destination": "/tools/extract-tables", "permanent": true },
+    { "source": "/tools/png-to-pdf", "destination": "/tools/jpg-to-pdf", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/tools/:slug", "destination": "/tools/:slug.html" },
+    { "source": "/legal/:page", "destination": "/legal/:page.html" },
+    { "source": "/blog/:slug", "destination": "/blog/:slug.html" },
+    { "source": "/:page", "destination": "/:page.html" }
+  ]
+}

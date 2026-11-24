@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="32" viewBox="0 0 150 32" role="img" aria-label="PDF Pilot 5U">
+  <defs>
+    <linearGradient id="brand" x1="3" y1="29" x2="31" y2="3" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B42318"/>
+      <stop offset=".52" stop-color="#D92D20"/>
+      <stop offset="1" stop-color="#F97066"/>
+    </linearGradient>
+    <linearGradient id="wordmark" x1="91" y1="11" x2="148" y2="25" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F97066"/>
+      <stop offset=".52" stop-color="#FDA29B"/>
+      <stop offset="1" stop-color="#FECDCA"/>
+    </linearGradient>
+  </defs>
+  <path d="M9 2.5h11.5L29 11v17.5a2 2 0 0 1-2 2H9a6 6 0 0 1-6-6v-16a6 6 0 0 1 6-6Z" fill="url(#brand)"/>
+  <path d="M20.5 2.5V8a3 3 0 0 0 3 3H29L20.5 2.5Z" fill="#FBBF24"/>
+  <path d="M20.5 2.5V8a3 3 0 0 0 3 3H29" fill="none" stroke="#FFF" stroke-opacity=".72" stroke-width="1"/>
+  <rect x="9" y="13.5" width="14" height="2.4" rx="1.2" fill="#FFF"/>
+  <rect x="9" y="18.2" width="10" height="2.4" rx="1.2" fill="#FFF" fill-opacity=".85"/>
+  <rect x="9" y="22.9" width="12" height="2.4" rx="1.2" fill="#FFF" fill-opacity=".7"/>
+  <text x="38" y="22.5" fill="#F8FAFC" font-family="Inter,Arial,sans-serif" font-size="17" font-weight="800" letter-spacing="-.7"><tspan>PDF </tspan><tspan fill="url(#wordmark)">Pilot 5U</tspan></text>
+</svg>

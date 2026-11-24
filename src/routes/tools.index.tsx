@@ -6,8 +6,11 @@ import { useI18n } from '#/lib/i18n'
 export const Route = createFileRoute('/tools/')({
   staticData: { pageId: 'pg_tI8kSa1wEd3F', funnel: { next: [] } },
   head: () => ({
+    links: import.meta.env.VITE_PUBLIC_SITE_URL
+      ? [{ rel: 'canonical', href: new URL('/tools', import.meta.env.VITE_PUBLIC_SITE_URL).toString() }]
+      : [],
     meta: [
-      { title: 'All PDF tools — PDFTools' },
+      { title: 'All PDF tools — PDF Pilot 5U' },
       { name: 'description', content: 'Merge, split, compress, sign and convert PDFs for free, right in your browser.' },
     ],
   }),

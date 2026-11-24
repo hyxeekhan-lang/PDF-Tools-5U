@@ -2,32 +2,36 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Direction: clean, calm, trustworthy. Red accent from the PDFTools mark. */
+/* Direction: clean, calm, trustworthy. Red identity for PDF Pilot 5U. */
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-urdu: "Noto Nastaliq Urdu", "Noto Naskh Arabic", serif;
-  --color-paper: #fffafa;
+  --color-paper: #fffcfb;
   --color-card: #ffffff;
-  --color-blush: #fff1f0;
+  --color-blush: #fef3f2;
   --color-ink: #101828;
   --color-muted: #667085;
-  --color-line: #f3e3e1;
-  --color-accent: #f04438;
-  --color-accent-dark: #d92d20;
+  --color-line: #f2e4e1;
+  --color-accent: #d92d20;
+  --color-accent-dark: #b42318;
   --color-accent-ink: #ffffff;
   --radius-card: 1.25rem;
-  --shadow-soft: 0 1px 2px rgb(16 24 40 / 0.04), 0 8px 24px -8px rgb(240 68 56 / 0.12);
+  --shadow-soft: 0 1px 2px rgb(16 24 40 / 0.04), 0 8px 24px -8px rgb(217 45 32 / 0.12);
 }
 
 .dark {
   --color-paper: #0d1018;
   --color-card: #161a24;
-  --color-blush: #2a1517;
+  --color-blush: #341b1d;
   --color-ink: #f2f4f7;
   --color-muted: #98a2b3;
-  --color-line: #2a2f3c;
+  --color-line: #482b2c;
   --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
+}
+
+.dark .text-accent-dark {
+  color: #fda29b;
 }
 
 * {

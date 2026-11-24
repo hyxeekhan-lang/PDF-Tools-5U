@@ -65,7 +65,7 @@ export function Slider({
         value={value}
         aria-label={label}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="h-2 w-full cursor-pointer accent-[#F04438]"
+        className="h-2 w-full cursor-pointer accent-accent"
       />
       <span className="w-16 shrink-0 text-end text-sm font-semibold tabular-nums" dir="ltr">
         {display}

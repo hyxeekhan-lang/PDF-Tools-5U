@@ -15,7 +15,7 @@ export function DropFrame({ dragging }: { dragging: boolean }) {
           rx="19"
           style={{ width: 'calc(100% - 2px)', height: 'calc(100% - 2px)' }}
           fill="none"
-          stroke="#F04438"
+          stroke="var(--color-accent)"
           strokeOpacity={dragging ? 1 : 0.5}
           strokeWidth="2"
         />

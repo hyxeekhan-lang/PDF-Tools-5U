@@ -1,28 +1,45 @@
-import { Link, createFileRoute, notFound } from '@tanstack/react-router'
+import { Link, createFileRoute, notFound, redirect } from '@tanstack/react-router'
 import { Clock, Info, ShieldCheck } from 'lucide-react'
 import { ToolCard, ToolIcon } from '#/components/ToolCard'
 import { ToolWorkspace } from '#/components/tool/ToolWorkspace'
 import { useI18n } from '#/lib/i18n'
-import { TOOLS, getTool } from '#/lib/tools'
+import { LISTED_TOOLS, TOOL_REDIRECTS, getTool } from '#/lib/tools'
 
 export const Route = createFileRoute('/tools/$slug')({
   staticData: { pageId: 'pg_tS4hGy9oPn7B', funnel: { next: [] } },
   loader: ({ params }) => {
+    const canonicalSlug = TOOL_REDIRECTS[params.slug]
+    if (canonicalSlug) {
+      throw redirect({ to: '/tools/$slug', params: { slug: canonicalSlug }, statusCode: 301 })
+    }
     const tool = getTool(params.slug)
     if (!tool) throw notFound()
-    return { name: tool.name.en, desc: tool.desc.en, soon: tool.status === 'soon' }
+    return {
+      slug: tool.slug,
+      name: tool.name.en,
+      desc: tool.desc.en,
+      soon: tool.status === 'soon',
+      ai: tool.category === 'ai' || tool.slug === 'pdf-translator',
+    }
   },
   head: ({ loaderData }) => ({
+    links: loaderData && import.meta.env.VITE_PUBLIC_SITE_URL
+      ? [{ rel: 'canonical', href: new URL(`/tools/${loaderData.slug}`, import.meta.env.VITE_PUBLIC_SITE_URL).toString() }]
+      : [],
     meta: loaderData
       ? [
           {
             title: loaderData.soon
-              ? `${loaderData.name} (coming soon) — PDFTools`
-              : `${loaderData.name} free, in your browser — PDFTools`,
+              ? `${loaderData.name} (coming soon) — PDF Pilot 5U`
+              : loaderData.ai
+                ? `${loaderData.name} AI PDF tool — PDF Pilot 5U`
+              : `${loaderData.name} free, in your browser — PDF Pilot 5U`,
           },
           { name: 'description', content: loaderData.desc },
-          { property: 'og:title', content: `${loaderData.name} — PDFTools` },
+          { property: 'og:title', content: `${loaderData.name} — PDF Pilot 5U` },
           { property: 'og:description', content: loaderData.desc },
+          { name: 'twitter:card', content: 'summary' },
+          ...(loaderData.soon ? [{ name: 'robots', content: 'noindex, nofollow' }] : []),
         ]
       : [],
   }),
@@ -34,7 +51,7 @@ function ToolPage() {
   const tool = getTool(slug)!
   const { t, tr, pick } = useI18n()
   const soon = tool.status === 'soon'
-  const related = TOOLS.filter((x) => x.slug !== tool.slug && x.status === 'working' && (soon || x.category === tool.category)).slice(0, 4)
+  const related = LISTED_TOOLS.filter((x) => x.slug !== tool.slug && (soon || x.category === tool.category)).slice(0, 4)
 
   return (
     <div>
@@ -57,7 +74,9 @@ function ToolPage() {
                 ) : (
                   <span className="inline-flex items-center gap-1 rounded-full bg-blush px-3 py-1 text-xs font-semibold text-accent">
                     <ShieldCheck className="size-3.5" />
-                    {tr('Runs in your browser', 'آپ کے براؤزر میں')}
+                    {tool.category === 'ai' || tool.slug === 'pdf-translator'
+                      ? tr('AI uses Gemini with your consent', 'AI آپ کی اجازت سے Gemini استعمال کرتا ہے')
+                      : tr('Runs in your browser', 'آپ کے براؤزر میں')}
                   </span>
                 )}
               </div>
@@ -83,7 +102,34 @@ function ToolPage() {
             <p className="mx-auto mt-2 max-w-lg text-muted">{t('page.soonBody')}</p>
           </div>
         ) : (
-          <ToolWorkspace key={tool.slug} tool={tool} />
+          <>
+            <ToolWorkspace key={tool.slug} tool={tool} />
+            <section className="mt-12 border-t border-line pt-8" aria-labelledby="tool-guide-heading">
+              <h2 id="tool-guide-heading" className="font-display text-2xl font-bold">
+                How to use {pick(tool.name)}
+              </h2>
+              <p className="mt-3 leading-relaxed text-muted">{pick(tool.desc)}</p>
+              <ol className="mt-5 list-inside list-decimal space-y-2 leading-relaxed text-muted">
+                <li>
+                  Choose {tool.multiple ? 'one or more' : 'a'} {tool.accepts === 'pdf' ? 'PDF' : tool.accepts.toUpperCase()} file{tool.multiple ? 's' : ''} from your device.
+                </li>
+                <li>Review the preview and available options before processing.</li>
+                <li>Run the tool, inspect the result, and download it only if it looks correct.</li>
+              </ol>
+              {tool.note && <p className="mt-4 rounded-xl bg-blush px-4 py-3 text-sm leading-relaxed">{pick(tool.note)}</p>}
+              <p className="mt-4 text-sm leading-relaxed text-muted">
+                {tool.category === 'ai' || tool.slug === 'pdf-translator'
+                  ? tr(
+                      'Your source PDF stays in this browser. Extracted text is sent to Google Gemini only after your explicit consent; a registered account is not required. Check the AI response before relying on it.',
+                      'اصل PDF اسی براؤزر میں رہتی ہے۔ واضح اجازت کے بعد صرف نکالا ہوا متن Google Gemini کو بھیجا جاتا ہے؛ رجسٹرڈ اکاؤنٹ ضروری نہیں۔ AI جواب پر بھروسا کرنے سے پہلے اسے چیک کریں۔',
+                    )
+                  : tr(
+                      'Your file is processed in this browser. Keep your original and check the downloaded result before relying on it.',
+                      'آپ کی فائل اسی براؤزر میں پروسیس ہوتی ہے۔ اصل فائل محفوظ رکھیں اور ڈاؤن لوڈ کردہ نتیجہ استعمال کرنے سے پہلے چیک کریں۔',
+                    )}
+              </p>
+            </section>
+          </>
         )}
 
         {related.length > 0 && (

@@ -1,12 +1,43 @@
-Welcome to your new TanStack Start app!
+# PDF Pilot 5U
+
+PDF Pilot 5U is a browser-first PDF workspace built with TanStack Start, React, TypeScript, PDF.js and pdf-lib.
+Local PDF tools process files in the browser. Optional AI tools require explicit consent before extracted text is sent
+to Google Gemini; a registered account is not required. Account data and anonymous AI sessions are handled by Supabase.
+Basic DOCX, XLSX, PPTX, and HTML conversions extract text into a simple PDF; they do not preserve layout or embedded media.
+PDF-to-DOCX/XLSX exports selectable text with simplified structure, not faithful page layouts or reconstructed tables.
+PDF-to-PowerPoint converts each page into a full-slide image, preserving appearance but not editable content.
+HEIC conversion, English OCR, notes, text highlights, freehand drawing and selectable-text redaction run locally in the browser. OCR downloads its English language model from Tesseract's configured CDN. Redaction rasterizes every page and removes interactive content; check every page and result before sharing.
+Protect PDF applies AES-256 encryption locally. Unlock PDF requires the correct password; password recovery and bypass are not provided. Unlock encrypted PDFs before using other tools.
+
+## External integrations
+
+Authentication and user-scoped history use Supabase. Copy `.env.example` to `.env.local`, configure
+`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, then run `supabase/schema.sql` in the Supabase SQL editor.
+Enable email verification and configure the Google provider/redirect URLs in Supabase Auth before offering Google login.
+Google sign-in remains on Supabase. Optional Firebase Analytics uses the public `VITE_FIREBASE_*` web configuration
+and is initialized only when valid configuration is present and the user chooses “Accept all” in the cookie notice.
+Without that configuration it remains unavailable; “Accept only essential” keeps it disabled. Configure the Firebase values from the Firebase console in `.env.local` for local development and as
+Vercel build environment variables before deploying.
+
+The Vercel Supabase integration can provide `SUPABASE_URL` and `SUPABASE_ANON_KEY`; the build maps only these public values to the browser. Never expose `SUPABASE_SERVICE_ROLE_KEY` or a Gemini key through a `VITE_` variable. The Neon/Postgres connection variables are not used by the current app; profiles and processing history remain in Supabase.
+
+Gemini document tools require the server-only `GEMINI_API_KEY` and Supabase anonymous sign-ins enabled. For local development, put the Gemini key in `.env.local` without a `VITE_` prefix; Vite forwards `/api/ai` to the existing server handler. When a visitor is not signed in, the app creates a guest session automatically; a registered account is optional. Users explicitly consent before extracted selectable PDF text is sent to Google Gemini, while the PDF itself stays in the browser. Requests accept up to 60,000 text characters; chat accepts up to eight messages, and the API limits each guest or signed-in session to 12 requests per minute per server instance. Scanned PDFs need OCR first.
+
+Payments, server-side high-fidelity LibreOffice conversion, certificate-backed signatures, PDF/A conversion and additional OCR languages still require provider/worker configuration. No ad spaces or AdSense ads are rendered. After approval, set `ADSENSE_PUBLISHER_ID` to a valid `pub-` ID to generate the corresponding `ads.txt`; configure region-appropriate consent management before loading ads.
+
+The tool catalog and dispatch checks do not mean every tool has been executed end-to-end. See [IMPLEMENTATION_CHECKLIST.md](./IMPLEMENTATION_CHECKLIST.md) for what has been tested and what remains unverified. Local files are limited to 100 MiB per file; browser memory and available device resources can impose additional practical limits.
+
+Set `PUBLIC_SITE_URL` before building for production to generate the sitemap with the correct domain. Without it,
+sitemap generation is skipped rather than emitting placeholder URLs. See [IMPLEMENTATION_CHECKLIST.md](./IMPLEMENTATION_CHECKLIST.md)
+for current implementation status and outstanding verification.
 
 # Getting Started
 
 To run this application:
 
 ```bash
-bun install
-bun --bun run dev
+npm install
+npm run dev
 ```
 
 # Building For Production
@@ -14,7 +45,7 @@ bun --bun run dev
 To build this application for production:
 
 ```bash
-bun --bun run build
+npm run build
 ```
 
 ## Styling

@@ -1,8 +1,9 @@
 import { Link } from '@tanstack/react-router'
-import { ChevronDown, FolderOpen, Menu, Moon, Sun, X } from 'lucide-react'
+import { ChevronDown, FolderOpen, Menu, Moon, Sun, UserRound, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useI18n, useTheme } from '#/lib/i18n'
-import { CATEGORIES, TOOLS } from '#/lib/tools'
+import { CATEGORIES, LISTED_TOOLS } from '#/lib/tools'
+import { InstallAppButton } from './InstallAppButton'
 import { Logo } from './Logo'
 
 export function Header() {
@@ -11,6 +12,26 @@ export function Header() {
   const [toolsOpen, setToolsOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const dropRef = useRef<HTMLDivElement>(null)
+  const toolsCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const toolsPointerOver = useRef(false)
+
+  const clearToolsClose = () => {
+    if (toolsCloseTimer.current) clearTimeout(toolsCloseTimer.current)
+    toolsCloseTimer.current = null
+  }
+
+  const openTools = () => {
+    clearToolsClose()
+    setToolsOpen(true)
+  }
+
+  const scheduleToolsClose = () => {
+    clearToolsClose()
+    toolsCloseTimer.current = setTimeout(() => {
+      setToolsOpen(false)
+      toolsCloseTimer.current = null
+    }, 350)
+  }
 
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
@@ -22,15 +43,18 @@ export function Header() {
     return () => {
       document.removeEventListener('mousedown', onDoc)
       document.removeEventListener('keydown', onKey)
+      clearToolsClose()
     }
   }, [])
 
   const close = () => {
+    clearToolsClose()
+    toolsPointerOver.current = false
     setToolsOpen(false)
     setMobileOpen(false)
   }
 
-  const navLink = 'rounded-lg px-3 py-2 text-[15px] font-medium text-muted transition hover:bg-blush hover:text-ink'
+  const navLink = 'rounded-lg px-3 py-2 text-[15px] font-medium text-muted transition hover:bg-blush hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent'
 
   const LangSwitch = (
     <div className="flex rounded-full border border-line bg-card p-0.5 text-xs font-semibold" role="group" aria-label={t('nav.language')}>
@@ -64,7 +88,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-line/70 bg-paper/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-5 lg:px-8">
-        <Link to="/" onClick={close} aria-label="PDFTools home" className="shrink-0">
+        <Link to="/" onClick={close} aria-label="PDF Pilot 5U home" className="shrink-0">
           <Logo />
         </Link>
 
@@ -72,12 +96,26 @@ export function Header() {
           <Link to="/" hash="features" className={navLink}>
             {t('nav.features')}
           </Link>
-          <div className="relative" ref={dropRef}>
+          <div
+            className="relative"
+            ref={dropRef}
+            onMouseEnter={() => {
+              toolsPointerOver.current = true
+              openTools()
+            }}
+            onMouseLeave={() => {
+              toolsPointerOver.current = false
+              scheduleToolsClose()
+            }}
+          >
             <button
               type="button"
               className={`${navLink} inline-flex items-center gap-1`}
               aria-expanded={toolsOpen}
-              onClick={() => setToolsOpen((o) => !o)}
+              onClick={() => {
+                if (toolsPointerOver.current) setToolsOpen(true)
+                else setToolsOpen((o) => !o)
+              }}
             >
               {t('nav.tools')}
               <ChevronDown className={`size-4 transition ${toolsOpen ? 'rotate-180' : ''}`} />
@@ -85,7 +123,15 @@ export function Header() {
             {(
               <div
                 inert={!toolsOpen}
-                className={`absolute start-0 top-full mt-2 grid w-[760px] origin-top grid-cols-5 gap-5 rounded-card border border-line bg-card p-5 shadow-[var(--shadow-soft)] transition-[opacity,transform,visibility] duration-200 ease-[var(--ease-out)] ${
+                onMouseEnter={() => {
+                  toolsPointerOver.current = true
+                  openTools()
+                }}
+                onMouseLeave={() => {
+                  toolsPointerOver.current = false
+                  scheduleToolsClose()
+                }}
+                className={`fixed left-4 right-4 top-16 mx-auto grid max-h-[70dvh] w-[min(880px,calc(100vw-2rem))] origin-top grid-cols-3 gap-4 overflow-y-auto rounded-card border border-line bg-card p-4 shadow-[var(--shadow-soft)] transition-[opacity,transform,visibility] duration-200 ease-[var(--ease-out)] xl:grid-cols-5 xl:gap-5 xl:p-5 ${
                   toolsOpen ? 'visible translate-y-0 scale-100 opacity-100' : 'invisible -translate-y-1.5 scale-[0.98] opacity-0'
                 }`}
               >
@@ -93,15 +139,16 @@ export function Header() {
                   <div key={cat}>
                     <p className="mb-2 text-xs font-semibold tracking-wide text-accent uppercase">{t(`cat.${cat}` as const)}</p>
                     <ul className="space-y-0.5">
-                      {TOOLS.filter((x) => x.category === cat).map((tool) => (
+                      {LISTED_TOOLS.filter((x) => x.category === cat).map((tool) => (
                         <li key={tool.slug}>
                           <Link
                             to="/tools/$slug"
                             params={{ slug: tool.slug }}
                             onClick={close}
-                            className="flex items-center justify-between gap-2 rounded-md py-1 text-sm text-ink/85 hover:text-accent"
+                            className="group flex items-start gap-2 rounded-md py-1 text-sm text-ink/85 transition hover:bg-ink/5 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                           >
-                            <span>{pick(tool.name)}</span>
+                            <tool.icon className="mt-0.5 size-4 shrink-0 text-muted transition-colors group-hover:text-ink" aria-hidden />
+                            <span className="min-w-0">{pick(tool.name)}</span>
                             {tool.status === 'soon' && <span className="size-1.5 shrink-0 rounded-full bg-muted/40" title={t('tool.soon')} />}
                           </Link>
                         </li>
@@ -112,7 +159,7 @@ export function Header() {
                 <Link
                   to="/tools"
                   onClick={close}
-                  className="col-span-5 border-t border-line pt-3 text-sm font-semibold text-accent hover:text-accent-dark"
+                  className="col-span-full border-t border-line pt-3 text-sm font-semibold text-accent hover:text-accent-dark"
                 >
                   {t('nav.allTools')} →
                 </Link>
@@ -141,6 +188,13 @@ export function Header() {
           >
             <FolderOpen className="size-4" />
             {t('nav.myFiles')}
+          </Link>
+          <div className="hidden lg:block">
+            <InstallAppButton className="press inline-flex min-h-10 items-center rounded-full border border-line px-3 text-sm font-semibold text-muted hover:border-accent/50 hover:text-accent" />
+          </div>
+          <Link to="/login" className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-[15px] font-medium text-muted hover:text-ink lg:inline-flex">
+            <UserRound className="size-4" />
+            Sign in
           </Link>
           <Link
             to="/"
@@ -182,7 +236,16 @@ export function Header() {
             <Link to="/my-files" onClick={close} className="py-3">
               {t('nav.myFiles')}
             </Link>
+            <Link to="/login" onClick={close} className="py-3">
+              Sign in
+            </Link>
+            <Link to="/dashboard" onClick={close} className="py-3">
+              Dashboard
+            </Link>
           </nav>
+          <div className="border-t border-line py-3">
+            <InstallAppButton className="press inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm font-semibold text-muted hover:border-accent/50 hover:text-accent" />
+          </div>
           <div className="flex items-center gap-3 border-t border-line pt-4">
             {LangSwitch}
             {ThemeButton}

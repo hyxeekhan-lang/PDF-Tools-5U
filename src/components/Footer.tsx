@@ -1,20 +1,22 @@
 import { Link } from '@tanstack/react-router'
 import { useI18n } from '#/lib/i18n'
+import { openCookieSettings } from '#/lib/cookie-consent'
 import { POPULAR, getTool } from '#/lib/tools'
 import { Logo } from './Logo'
+import { InstallAppButton } from './InstallAppButton'
 
 export function Footer() {
   const { t, pick } = useI18n()
   const link = 'text-muted transition hover:text-accent'
   return (
-    <footer className="border-t border-line bg-card">
+    <footer aria-label="Site information" className="border-t border-line bg-card">
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:px-8">
         <div>
           <Logo />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">{t('footer.tagline')}</p>
         </div>
         <div>
-          <p className="text-sm font-semibold">{t('footer.tools')}</p>
+          <h2 className="text-sm font-semibold">{t('footer.tools')}</h2>
           <ul className="mt-4 space-y-2.5 text-sm">
             {POPULAR.map((slug) => {
               const tool = getTool(slug)!
@@ -29,7 +31,7 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <p className="text-sm font-semibold">{t('footer.company')}</p>
+          <h2 className="text-sm font-semibold">{t('footer.company')}</h2>
           <ul className="mt-4 space-y-2.5 text-sm">
             <li>
               <Link to="/about" className={link}>
@@ -47,14 +49,22 @@ export function Footer() {
               </Link>
             </li>
             <li>
+              <Link to="/help" className={link}>
+                {t('footer.faq')}
+              </Link>
+            </li>
+            <li>
               <Link to="/blog" className={link}>
                 {t('footer.blog')}
               </Link>
             </li>
+            <li>
+              <InstallAppButton className={link} />
+            </li>
           </ul>
         </div>
         <div>
-          <p className="text-sm font-semibold">{t('footer.legal')}</p>
+          <h2 className="text-sm font-semibold">{t('footer.legal')}</h2>
           <ul className="mt-4 space-y-2.5 text-sm">
             <li>
               <Link to="/legal/$page" params={{ page: 'privacy' }} className={link}>
@@ -76,11 +86,16 @@ export function Footer() {
                 {t('footer.cookies')}
               </Link>
             </li>
+            <li>
+              <Link to="/legal/$page" params={{ page: 'cookies' }} hash="privacy-settings" onClick={openCookieSettings} className={link}>
+                {t('footer.privacySettings')}
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
       <div className="border-t border-line">
-        <p className="mx-auto max-w-7xl px-5 py-6 text-xs text-muted lg:px-8">© {new Date().getFullYear()} PDFTools</p>
+        <p className="mx-auto max-w-7xl px-5 py-6 text-xs text-muted lg:px-8">© {new Date().getFullYear()} PDF Pilot 5U</p>
       </div>
     </footer>
   )

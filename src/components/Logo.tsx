@@ -1,24 +1,20 @@
 export function LogoMark({ className = 'size-8' }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden>
-      <rect x="4" y="2" width="24" height="28" rx="6" fill="#F04438" />
-      <path d="M20 2h2a6 6 0 0 1 6 6v2h-5a3 3 0 0 1-3-3V2Z" fill="#D92D20" />
-      <path d="M20 2v5a3 3 0 0 0 3 3h5" fill="none" stroke="#FFF1F0" strokeOpacity=".55" strokeWidth="1.2" />
-      <rect x="9" y="14" width="14" height="2.4" rx="1.2" fill="#fff" />
-      <rect x="9" y="19" width="10" height="2.4" rx="1.2" fill="#fff" fillOpacity=".85" />
-      <rect x="9" y="24" width="12" height="2.4" rx="1.2" fill="#fff" fillOpacity=".7" />
+      <path d="M9 2.5h11.5L29 11v17.5a2 2 0 0 1-2 2H9a6 6 0 0 1-6-6v-16a6 6 0 0 1 6-6Z" fill="#D92D20" />
+      <path d="M20.5 2.5V8a3 3 0 0 0 3 3H29L20.5 2.5Z" fill="#FBBF24" />
+      <rect x="9" y="13.5" width="14" height="2.4" rx="1.2" fill="#fff" />
+      <rect x="9" y="18.2" width="10" height="2.4" rx="1.2" fill="#fff" fillOpacity=".85" />
+      <rect x="9" y="22.9" width="12" height="2.4" rx="1.2" fill="#fff" fillOpacity=".7" />
     </svg>
   )
 }
 
 export function Logo({ className = '' }: { className?: string }) {
   return (
-    <span dir="ltr" className={`inline-flex items-center gap-2 ${className}`}>
-      <LogoMark />
-      <span className="font-display text-xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-        <span className="text-ink">PDF</span>
-        <span className="text-accent">Tools</span>
-      </span>
+    <span dir="ltr" className={`inline-flex items-center ${className}`}>
+      <img src="/brand/logo.svg" alt="PDF Pilot 5U" className="h-8 w-[150px] dark:hidden" width="150" height="32" />
+      <img src="/brand/logo-dark.svg" alt="PDF Pilot 5U" className="hidden h-8 w-[150px] dark:block" width="150" height="32" />
     </span>
   )
 }

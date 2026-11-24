@@ -1,17 +1,23 @@
 import { Link } from '@tanstack/react-router'
 import { useI18n } from '#/lib/i18n'
 import type { Tool } from '#/lib/tools'
+import { PdfToolIcon, resolvePdfToolIconName } from './PdfToolIcon'
 
 export function ToolIcon({ tool, size = 'md' }: { tool: Tool; size?: 'md' | 'lg' }) {
-  const Icon = tool.icon
-  const soon = tool.status === 'soon'
+  const { pick } = useI18n()
+  const iconSize = size === 'lg' ? 32 : 24
   return (
     <span
-      className={`grid shrink-0 place-items-center rounded-xl transition-transform duration-300 ease-[var(--ease-spring)] group-hover:-rotate-6 group-hover:scale-110 rtl:group-hover:rotate-6 ${
-        size === 'lg' ? 'size-14' : 'size-11'
-      } ${soon ? 'bg-ink/5 text-muted' : 'bg-blush text-accent group-hover:bg-accent group-hover:text-white'}`}
+      className={`grid shrink-0 place-items-center rounded-2xl bg-accent text-white shadow-sm ${
+        size === 'lg' ? 'size-14' : 'size-12'
+      }`}
     >
-      <Icon className={size === 'lg' ? 'size-7' : 'size-5'} aria-hidden />
+      <PdfToolIcon
+        name={resolvePdfToolIconName(tool.slug)}
+        size={iconSize}
+        title={pick(tool.name)}
+        className="shrink-0"
+      />
     </span>
   )
 }
@@ -23,10 +29,10 @@ export function ToolCard({ tool }: { tool: Tool }) {
     <Link
       to="/tools/$slug"
       params={{ slug: tool.slug }}
-      className={`group flex h-full items-start gap-4 rounded-card border border-line bg-card p-4 transition duration-300 ease-[var(--ease-out)] sm:flex-col sm:gap-0 sm:p-5 ${
+      className={`group flex h-full items-start gap-4 rounded-card border border-line bg-card p-4 transition duration-300 ease-[var(--ease-out)] focus-visible:bg-blush focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 sm:flex-col sm:gap-0 sm:p-5 ${
         soon
           ? 'opacity-80 hover:opacity-100'
-          : 'shadow-[var(--shadow-soft)] hover:-translate-y-1 hover:border-accent/40 hover:shadow-[0_18px_40px_-18px_rgb(240_68_56/0.35)] active:translate-y-0 active:scale-[0.99]'
+          : 'shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:border-ink/15 hover:bg-card hover:shadow-md active:translate-y-0 active:scale-[0.99]'
       }`}
     >
       <div className="flex shrink-0 items-start justify-between gap-3 sm:w-full">

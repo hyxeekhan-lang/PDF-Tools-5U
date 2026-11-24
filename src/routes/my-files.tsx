@@ -11,8 +11,8 @@ export const Route = createFileRoute('/my-files')({
   staticData: { pageId: 'pg_mF2yUq7aZc4E', funnel: { next: [] } },
   head: () => ({
     meta: [
-      { title: 'My Files — PDFTools' },
-      { name: 'description', content: 'Recent results you created with PDFTools, stored only in this browser.' },
+      { title: 'My Files — PDF Pilot 5U' },
+      { name: 'description', content: 'Recent results you created with PDF Pilot 5U, stored only in this browser.' },
     ],
   }),
   component: MyFiles,

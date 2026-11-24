@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "PDF Pilot 5U — PDF tools",
+  "short_name": "PDF Pilot 5U",
+  "description": "Work with PDFs in your browser. Local processing with clear privacy controls.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fffcfb",
+  "theme_color": "#d92d20",
+  "icons": [
+    {
+      "src": "/brand/pwa-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/pwa-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
