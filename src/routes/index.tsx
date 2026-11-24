@@ -32,6 +32,7 @@ function Home() {
       <Why />
       <How />
       <Security />
+      <CapabilityStrip />
       <Pricing />
       <Faq />
     </>
@@ -216,6 +217,28 @@ function Security() {
             </li>
           ))}
         </ul>
+      </div>
+    </section>
+  )
+}
+
+function CapabilityStrip() {
+  const { t } = useI18n()
+  return (
+    <section aria-labelledby="capabilities-title" className="border-y border-line bg-card">
+      <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8">
+        <h2 id="capabilities-title" className="sr-only">
+          {t('proof.title')}
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((n) => (
+            <article key={n} className="rounded-2xl border border-line px-5 py-6 text-center">
+              <p className="font-display text-2xl font-extrabold">{t(`proof.${n}.title` as TKey)}</p>
+              <p className="mt-2 text-sm font-semibold text-muted">{t(`proof.${n}.label` as TKey)}</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted">{t(`proof.${n}.description` as TKey)}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   )

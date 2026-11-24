@@ -25,6 +25,30 @@ function About() {
       intro="PDF Pilot 5U is a browser-based PDF workspace built around one idea: everyday PDF jobs should not require uploading your documents."
     >
       <Prose>
+        <section
+          aria-labelledby="about-owner"
+          className="grid items-center gap-6 rounded-2xl border border-line bg-card p-5 sm:grid-cols-[10rem_1fr] sm:p-6"
+        >
+          <img
+            src="/images/hamid.jpg"
+            alt="Hamid, owner of PDF Pilot 5U"
+            width={206}
+            height={206}
+            loading="lazy"
+            decoding="async"
+            className="mx-auto aspect-square w-40 rounded-2xl object-cover shadow-[var(--shadow-soft)] sm:w-full"
+          />
+          <div>
+            <p className="text-sm font-semibold tracking-wide text-accent uppercase">Website owner</p>
+            <h2 id="about-owner" className="!mt-2 font-display text-2xl font-bold text-ink">
+              Hamid
+            </h2>
+            <p className="mt-2 text-base leading-relaxed text-muted">
+              Hamid owns PDF Pilot 5U and is based in Faisalabad, Pakistan. The site brings practical PDF tools together
+              in one browser-based workspace.
+            </p>
+          </div>
+        </section>
         <p>
           Most online PDF tools upload your file, process it on a server and send it back. That works, but it means your
           contracts, IDs and bank statements pass through a machine you don’t control.
