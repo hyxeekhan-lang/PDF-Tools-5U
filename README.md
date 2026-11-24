@@ -1,15 +1,79 @@
 # PDF Pilot 5U
 
-![PDF Pilot 5U homepage](./screenshots/homepage.png)
+<p align="center">
+  <img src="./public/brand/logo.svg" alt="PDF Pilot 5U" width="210" />
+</p>
 
-PDF Pilot 5U is a browser-first PDF workspace built with TanStack Start, React, TypeScript, PDF.js and pdf-lib.
-Local PDF tools process files in the browser. Optional AI tools require explicit consent before extracted text is sent
-to Google Gemini; a registered account is not required. Account data and anonymous AI sessions are handled by Supabase.
-Basic DOCX, XLSX, PPTX, and HTML conversions extract text into a simple PDF; they do not preserve layout or embedded media.
-PDF-to-DOCX/XLSX exports selectable text with simplified structure, not faithful page layouts or reconstructed tables.
-PDF-to-PowerPoint converts each page into a full-slide image, preserving appearance but not editable content.
-HEIC conversion, English OCR, notes, text highlights, freehand drawing and selectable-text redaction run locally in the browser. OCR downloads its English language model from Tesseract's configured CDN. Redaction rasterizes every page and removes interactive content; check every page and result before sharing.
-Protect PDF applies AES-256 encryption locally. Unlock PDF requires the correct password; password recovery and bypass are not provided. Unlock encrypted PDFs before using other tools.
+<p align="center">
+  Browser-first PDF tools for everyday document tasks. Pick a tool, process locally where supported, and download your result.
+</p>
+
+<p align="center">
+  <sub>Built with TanStack Start, React, TypeScript, PDF.js, and pdf-lib.</sub>
+</p>
+
+<p align="center">
+  <a href="https://pdfpilot5u.vercel.app/"><strong>Open PDF Pilot 5U ↗</strong></a>
+  ·
+  <a href="#product-screenshots">Explore the screenshots</a>
+</p>
+
+## Product screenshots
+
+These screenshots show the live interface with no user documents selected.
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <a href="./screenshots/homepage.png"><img src="./screenshots/homepage.png" alt="PDF Pilot 5U homepage with upload, search, and popular tools" width="100%" /></a><br />
+      <strong>Start from the homepage</strong><br />
+      <sub>Choose a file or search for a PDF task; the 100 MB per-file limit is shown up front.</sub>
+    </td>
+    <td align="center" width="50%">
+      <a href="./screenshots/tools-library.png"><img src="./screenshots/tools-library.png" alt="Searchable PDF tools library showing the Organize category" width="100%" /></a><br />
+      <strong>Find the right tool</strong><br />
+      <sub>Browse the categorized library or search by task, such as merge, split, or rotate.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <a href="./screenshots/merge-pdf.png"><img src="./screenshots/merge-pdf.png" alt="Merge PDFs page with local file selection area" width="100%" /></a><br />
+      <strong>Merge PDFs in your browser</strong><br />
+      <sub>Select PDFs, review their order, and check the result before downloading.</sub>
+    </td>
+    <td align="center" width="50%">
+      <a href="./screenshots/ai-chat.png"><img src="./screenshots/ai-chat.png" alt="Chat with PDF page explaining Gemini consent" width="100%" /></a><br />
+      <strong>Use optional AI with consent</strong><br />
+      <sub>The page explains that extracted text is sent to Gemini only after permission.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <a href="./screenshots/pdf-ocr.png"><img src="./screenshots/pdf-ocr.png" alt="PDF OCR page showing the English OCR model note" width="100%" /></a><br />
+      <strong>Make scanned PDFs searchable</strong><br />
+      <sub>English OCR runs in the browser; the model download and accuracy review are disclosed.</sub>
+    </td>
+    <td align="center" width="50%">
+      <a href="./screenshots/about.png"><img src="./screenshots/about.png" alt="About page introducing Hamid, owner of PDF Pilot 5U" width="100%" /></a><br />
+      <strong>Learn about the project</strong><br />
+      <sub>Meet Hamid, the site owner, and read about the browser-first approach.</sub>
+    </td>
+  </tr>
+</table>
+
+## Try it in three steps
+
+1. Open [PDF Pilot 5U](https://pdfpilot5u.vercel.app/).
+2. Search for a tool or choose one from the library, then select your file.
+3. Review the result and download it. For AI tools, approve the consent prompt before extracted text is sent to Google Gemini.
+
+## What to expect
+
+- Most PDF tools process source files in your browser. Optional AI sends extracted text to Google Gemini only after your explicit consent; a registered account is not required.
+- Local files are limited to 100 MiB each. Browser memory and device resources can impose additional practical limits.
+- Basic DOCX, XLSX, PPTX, and HTML conversions extract text into a simple PDF; they do not preserve layout or embedded media. PDF-to-DOCX/XLSX exports selectable text with simplified structure, and PDF-to-PowerPoint converts each page into a full-slide image.
+- English OCR downloads its language model from Tesseract's configured CDN. Redaction rasterizes every page and removes interactive content; inspect each page and result before sharing.
+- Protect PDF applies AES-256 encryption locally. Unlock PDF requires the correct password; password recovery and bypass are not provided.
 
 ## External integrations
 
