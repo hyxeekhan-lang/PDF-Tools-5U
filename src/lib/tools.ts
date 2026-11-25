@@ -1,5 +1,6 @@
 import {
   ArrowDownUp,
+  Camera,
   FileArchive,
   FileImage,
   FileLock2,
@@ -192,6 +193,17 @@ export const TOOLS: Tool[] = [
     keywords: ['jpg', 'jpeg', 'png', 'image', 'photo', 'picture', 'convert', 'تصویر'],
   },
   {
+    slug: 'scan-to-pdf',
+    category: 'convert-to',
+    status: 'working',
+    icon: Camera,
+    accepts: 'image',
+    multiple: true,
+    name: { en: 'Scan to PDF', ur: 'اسکین سے PDF' },
+    desc: { en: 'Capture document pages with your phone camera, review them, and combine them into a PDF locally in your browser.', ur: 'موبائل کیمرے سے صفحات اسکین کریں، ترتیب دیکھیں اور براؤزر میں مقامی طور پر PDF بنائیں۔' },
+    keywords: ['scan', 'camera', 'document scanner', 'photo to pdf', 'mobile'],
+  },
+  {
     slug: 'word-to-pdf',
     category: 'convert-to',
     status: 'working',
@@ -349,7 +361,7 @@ export const LISTED_TOOLS = TOOLS.filter(
   (tool) => tool.status === 'working' && !TOOL_REDIRECTS[tool.slug],
 )
 
-export const POPULAR = ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf', 'pdf-to-jpg']
+export const POPULAR = ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf', 'pdf-to-jpg', 'scan-to-pdf']
 
 export const getTool = (slug: string) => TOOLS.find((t) => t.slug === slug)
 

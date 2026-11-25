@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, CloudUpload, Download, FileText, Image as ImageIcon, LoaderCircle, Plus, RotateCcw, ShieldCheck, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, Camera, CloudUpload, Download, FileText, Image as ImageIcon, LoaderCircle, Plus, RotateCcw, ShieldCheck, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { saveFiles, takePendingFiles } from '#/lib/files-store'
 import { useI18n } from '#/lib/i18n'
@@ -78,6 +78,7 @@ const OPTIONS: Record<string, (p: OptionsProps) => React.ReactNode> = {
   'add-watermark': WatermarkOptions,
   'sign-pdf': SignOptions,
   'jpg-to-pdf': JpgToPdfOptions,
+  'scan-to-pdf': JpgToPdfOptions,
   'png-to-pdf': JpgToPdfOptions,
   'pdf-to-jpg': PdfToJpgOptions,
   'pdf-to-text': PdfToTextOptions,
@@ -257,6 +258,19 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
     />
   )
 
+  const cameraPicker = tool.slug === 'scan-to-pdf' ? (
+    <input
+      type="file"
+      hidden
+      accept="image/jpeg,image/png"
+      capture="environment"
+      onChange={(e) => {
+        addFiles(Array.from(e.target.files ?? []))
+        e.target.value = ''
+      }}
+    />
+  ) : null
+
   const errorList = errors.length > 0 && (
     <div role="alert" className="space-y-1 rounded-xl border border-accent/30 bg-blush px-4 py-3 text-sm font-medium text-accent-dark">
       {errors.map((e, i) => (
@@ -361,6 +375,7 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
     return (
       <div className="space-y-4">
         {picker}
+        {cameraPicker}
         <div
           onDragOver={(e) => {
             e.preventDefault()
@@ -393,6 +408,15 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
           >
             {tool.multiple ? t('page.uploadMany') : t('page.upload')}
           </button>
+          {tool.slug === 'scan-to-pdf' && (
+            <button
+              type="button"
+              onClick={(e) => (e.currentTarget.previousElementSibling as HTMLButtonElement | null)?.focus() || (e.currentTarget.parentElement?.querySelector('input[capture]') as HTMLInputElement | null)?.click()}
+              className="press relative mt-3 inline-flex min-h-12 items-center gap-2 rounded-full border border-accent px-7 font-semibold text-accent hover:bg-blush"
+            >
+              <Camera className="size-5" aria-hidden="true" /> Scan with camera
+            </button>
+          )}
           <p className="mt-5 flex items-center justify-center gap-1.5 text-xs text-muted">
             <ShieldCheck className="size-4 shrink-0 text-accent" />
             {tool.category === 'ai' || tool.slug === 'pdf-translator'
@@ -410,6 +434,7 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
   return (
     <div className="space-y-5">
       {picker}
+      {cameraPicker}
       {state.phase === 'done' && renderResults(state)}
       <div className={`rounded-card border border-line bg-card p-4 shadow-[var(--shadow-soft)] ${state.phase === 'done' ? 'hidden' : ''}`}>
         <ul className="divide-y divide-line">
