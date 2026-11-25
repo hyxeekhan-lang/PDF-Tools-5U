@@ -59,9 +59,18 @@ function AppDownloadAndReviews() {
     <section className="border-y border-line bg-card">
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-20 lg:grid-cols-2 lg:px-8">
         <article className="rounded-card border border-line bg-paper p-7 shadow-[var(--shadow-soft)] md:p-9">
-          <div className="flex size-12 items-center justify-center rounded-2xl bg-accent text-white"><Download className="size-6" aria-hidden="true" /></div>
-          <h2 className="mt-5 font-display text-2xl font-extrabold">Use PDF Pilot 5U on Android</h2>
+          <div className="flex items-start justify-between gap-5">
+            <div className="grid size-16 place-items-center overflow-hidden rounded-[20px] bg-accent shadow-[var(--shadow-soft)] ring-4 ring-blush">
+              <img src="/brand/logo-icon.svg" alt="PDF Pilot 5U app logo" className="size-12" />
+            </div>
+            <span className="rounded-full border border-accent/20 bg-blush px-3 py-1 text-xs font-semibold text-accent-dark">Android APK</span>
+          </div>
+          <h2 className="mt-6 font-display text-2xl font-extrabold">Use PDF Pilot 5U on Android</h2>
           <p className="mt-3 leading-relaxed text-muted">Download the official PDF Pilot 5U Android wrapper for quick access to browser-based PDF tools on your phone.</p>
+          <div className="mt-6 grid gap-3 rounded-2xl border border-line bg-card p-4 text-sm text-muted sm:grid-cols-2">
+            <div><span className="block font-semibold text-ink">Quick access</span>Browser-based PDF tools</div>
+            <div><span className="block font-semibold text-ink">Package</span>com.webapp.pdfpilot5u</div>
+          </div>
           <a href="/downloads/pdf-pilot-5u.apk" download className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-full bg-accent px-6 font-semibold text-white hover:bg-accent-dark"><Download className="size-4" aria-hidden="true" /> Download APK</a>
           <p className="mt-3 text-xs text-muted">APK package: com.webapp.pdfpilot5u · Android app download</p>
         </article>
