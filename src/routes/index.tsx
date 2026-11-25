@@ -37,7 +37,7 @@ function Home() {
       <ToolsSection />
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <AdSenseUnit slot={3} />
-        <ThirdPartyAdUnit />
+        <ThirdPartyAdUnit slot={3} />
       </div>
       <Why />
       <How />
@@ -149,7 +149,7 @@ function Hero() {
           <ToolSearch className="mx-auto mt-8 max-w-xl" />
         </div>
         <AdSenseUnit slot={1} />
-        <ThirdPartyAdUnit />
+        <ThirdPartyAdUnit slot={2} />
         <div className="animate-fade-up mt-8" style={stagger(440)}>
           <p className="text-sm font-semibold text-muted">{t('popular.title')}</p>
           <div className="mt-3 flex flex-wrap justify-center gap-2">
@@ -194,7 +194,7 @@ function ToolsSection() {
     <section id="tools" className="scroll-mt-20 border-t border-line">
       <div className="mx-auto max-w-7xl px-5 py-20 md:py-24 lg:px-8">
         <AdSenseUnit slot={2} />
-        <ThirdPartyAdUnit />
+        <ThirdPartyAdUnit slot={1} />
         <div data-reveal className="max-w-2xl">
           <Eyebrow>{t('nav.tools')}</Eyebrow>
           <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-balance md:text-4xl">{t('all.title')}</h2>
