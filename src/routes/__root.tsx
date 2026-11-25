@@ -74,10 +74,20 @@ export const Route = createRootRoute({
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'PDF Pilot 5U',
+    url: SITE_URL,
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web browser',
+    description: 'Browser-based PDF tools to merge, split, compress, convert, edit and sign PDF files.',
+  }
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </head>
       <body className="bg-paper text-ink">
         {children}
