@@ -6,7 +6,6 @@ if (typeof window !== 'undefined' && dsn) {
   Sentry.init({
     dsn,
     environment: import.meta.env.MODE,
-    sendDefaultPii: false,
     tracesSampleRate: 0,
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: 0,
