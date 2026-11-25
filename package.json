@@ -13,9 +13,14 @@
     "preview": "vite preview",
     "test": "node --experimental-strip-types --test tests/pdf-core.test.mjs",
     "deploy": "whop apps deploy",
+    "mobile:sync": "npx cap sync android",
+    "mobile:open": "npx cap open android",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/cli": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
     "@neon/neon-js": "^0.10.2",
     "@neondatabase/serverless": "^1.2.1",
     "@pdfsmaller/pdf-decrypt": "^1.0.1",

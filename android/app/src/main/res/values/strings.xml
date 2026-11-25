@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PDF Pilot 5U</string>
+    <string name="title_activity_main">PDF Pilot 5U</string>
+    <string name="package_name">com.pdfpilot5u.app</string>
+    <string name="custom_url_scheme">com.pdfpilot5u.app</string>
+</resources>
