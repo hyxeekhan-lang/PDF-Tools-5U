@@ -92,7 +92,7 @@ export function Header() {
           <Logo />
         </Link>
 
-        <nav className="ms-6 hidden items-center gap-0.5 lg:flex">
+        <nav className="ms-6 hidden items-center gap-0.5 xl:flex">
           <Link to="/" hash="features" className={navLink}>
             {t('nav.features')}
           </Link>
@@ -184,28 +184,28 @@ export function Header() {
           </div>
           <Link
             to="/my-files"
-            className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-[15px] font-medium text-muted hover:text-ink lg:inline-flex"
+            className="hidden items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium leading-tight text-muted hover:text-ink xl:inline-flex"
           >
             <FolderOpen className="size-4" />
             {t('nav.myFiles')}
           </Link>
-          <div className="hidden lg:block">
-            <InstallAppButton className="press inline-flex min-h-10 items-center rounded-full border border-line px-3 text-sm font-semibold text-muted hover:border-accent/50 hover:text-accent" />
+          <div className="hidden xl:block">
+            <InstallAppButton className="press inline-flex min-h-10 items-center whitespace-nowrap rounded-full border border-line px-4 text-sm font-semibold leading-tight text-muted hover:border-accent/50 hover:text-accent" />
           </div>
-          <Link to="/login" className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-[15px] font-medium text-muted hover:text-ink lg:inline-flex">
+          <Link to="/login" className="hidden items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium leading-tight text-muted hover:text-ink xl:inline-flex">
             <UserRound className="size-4" />
             Sign in
           </Link>
           <Link
             to="/"
             hash="upload"
-            className="press hidden min-h-10 items-center rounded-full bg-accent px-5 text-[15px] font-semibold text-white shadow-sm hover:bg-accent-dark hover:shadow-md sm:inline-flex"
+            className="press hidden min-h-10 items-center whitespace-nowrap rounded-full bg-accent px-5 text-[15px] font-semibold text-white shadow-sm hover:bg-accent-dark hover:shadow-md xl:inline-flex"
           >
             {t('nav.getStarted')}
           </Link>
           <button
             type="button"
-            className="grid size-10 place-items-center rounded-full border border-line bg-card lg:hidden"
+            className="grid size-10 place-items-center rounded-full border border-line bg-card xl:hidden"
             aria-label={t('nav.menu')}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((o) => !o)}
@@ -216,7 +216,7 @@ export function Header() {
       </div>
 
       {mobileOpen && (
-        <div className="animate-fade-down max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-line bg-paper px-5 pb-6 lg:hidden">
+        <div className="animate-fade-down max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-line bg-paper px-5 pb-6 xl:hidden">
           <nav className="flex flex-col py-3 text-base font-medium">
             <Link to="/" hash="features" onClick={close} className="py-3">
               {t('nav.features')}
