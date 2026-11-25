@@ -343,6 +343,8 @@ const TOOL_ICON_ALIASES: Record<string, PdfToolIconName> = {
   "pdf-compare": "compare-pdfs",
   "pdf-metadata": "pdf-metadata-editor",
   "draw-pdf": "draw-on-pdf",
+  "pdf-accessibility-checker": "pdf-ocr",
+  "pdf-form-creator": "add-text",
 };
 
 function isPdfToolIconName(name: string): name is PdfToolIconName {
