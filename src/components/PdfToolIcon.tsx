@@ -338,9 +338,13 @@ export const PDF_TOOL_ICON_NAMES = Object.keys(PDF_TOOL_ICONS) as PdfToolIconNam
 
 const TOOL_ICON_ALIASES: Record<string, PdfToolIconName> = {
   "merge-pdf": "merge-pdfs",
+  "scan-to-pdf": "jpg-to-pdf",
+  "add-link-preview": "add-text",
   "pdf-compare": "compare-pdfs",
   "pdf-metadata": "pdf-metadata-editor",
   "draw-pdf": "draw-on-pdf",
+  "pdf-accessibility-checker": "pdf-ocr",
+  "pdf-form-creator": "add-text",
 };
 
 function isPdfToolIconName(name: string): name is PdfToolIconName {

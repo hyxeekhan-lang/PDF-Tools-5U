@@ -1,5 +1,6 @@
 import {
   ArrowDownUp,
+  Camera,
   FileArchive,
   FileImage,
   FileLock2,
@@ -19,6 +20,8 @@ import {
   Edit3,
   SlidersHorizontal,
   ListChecks,
+  Link,
+  Accessibility,
   Scissors,
   Stamp,
   type LucideIcon,
@@ -192,6 +195,27 @@ export const TOOLS: Tool[] = [
     keywords: ['jpg', 'jpeg', 'png', 'image', 'photo', 'picture', 'convert', 'تصویر'],
   },
   {
+    slug: 'scan-to-pdf',
+    category: 'convert-to',
+    status: 'working',
+    icon: Camera,
+    accepts: 'image',
+    multiple: true,
+    name: { en: 'Scan to PDF', ur: 'اسکین سے PDF' },
+    desc: { en: 'Capture document pages with your phone camera, review them, and combine them into a PDF locally in your browser.', ur: 'موبائل کیمرے سے صفحات اسکین کریں، ترتیب دیکھیں اور براؤزر میں مقامی طور پر PDF بنائیں۔' },
+    keywords: ['scan', 'camera', 'document scanner', 'photo to pdf', 'mobile'],
+  },
+  {
+    slug: 'add-link-preview',
+    category: 'edit',
+    status: 'working',
+    icon: Link,
+    accepts: 'pdf',
+    name: { en: 'Add Link Preview', ur: 'لنک پری ویو شامل کریں' },
+    desc: { en: 'Paste a website URL and add a polished clickable link card to every PDF page.', ur: 'ویب سائٹ URL درج کرکے ہر PDF صفحے پر clickable لنک کارڈ شامل کریں۔' },
+    keywords: ['link', 'url', 'preview', 'website'],
+  },
+  {
     slug: 'word-to-pdf',
     category: 'convert-to',
     status: 'working',
@@ -323,6 +347,8 @@ TOOLS.push(
   { slug: 'redact-pdf', category: 'secure', status: 'working', icon: FileLock2, accepts: 'pdf', name: { en: 'Redact PDF', ur: 'PDF کی حساس معلومات چھپائیں' }, desc: { en: 'Find selectable text and rasterize all pages with the matching text permanently masked. Review the output before sharing.', ur: 'منتخب متن تلاش کر کے متعلقہ حصے مستقل طور پر چھپا دیں۔ فائل شیئر کرنے سے پہلے نتیجے کا جائزہ لیں۔' }, keywords: ['redact', 'privacy', 'sensitive'] },
   { slug: 'extract-images', category: 'advanced', status: 'working', icon: FileImage, accepts: 'pdf', name: { en: 'Extract Images', ur: 'تصاویر نکالیں' }, desc: { en: 'Export embedded raster images from a PDF as individual PNG files. Vector artwork and full-page backgrounds are not extracted.', ur: 'PDF میں شامل راسٹر تصاویر کو الگ PNG فائلوں کے طور پر محفوظ کریں۔ ویکٹر آرٹ ورک اور مکمل صفحے کے پس منظر نہیں نکالے جاتے۔' }, keywords: ['extract', 'images', 'pdf'] },
   { slug: 'extract-tables', category: 'advanced', status: 'working', icon: FileSpreadsheet, accepts: 'pdf', name: { en: 'Extract Tables', ur: 'Extract Tables' }, desc: { en: 'Heuristically group positioned text into CSV rows and columns; review results for complex layouts.', ur: 'Extract PDF tables.' }, keywords: ['tables', 'extract', 'spreadsheet'] },
+  { slug: 'pdf-accessibility-checker', category: 'advanced', status: 'working', icon: Accessibility, accepts: 'pdf', name: { en: 'PDF Accessibility Checker', ur: 'PDF Accessibility Checker' }, desc: { en: 'Check page text availability, page sizes, and basic reading signals in a PDF. This browser report is not formal PDF/UA certification.', ur: 'PDF accessibility checker.' }, keywords: ['accessibility', 'pdfua', 'a11y', 'checker'] },
+  { slug: 'pdf-form-creator', category: 'edit', status: 'working', icon: Edit3, accepts: 'pdf', name: { en: 'PDF Form Creator', ur: 'PDF Form Creator' }, desc: { en: 'Add simple fillable text fields to the first page of an existing PDF and download a new interactive form.', ur: 'PDF form creator.' }, keywords: ['form', 'fillable', 'fields', 'acroform'] },
   { slug: 'extract-metadata', category: 'advanced', status: 'working', icon: SlidersHorizontal, accepts: 'pdf', name: { en: 'Extract Metadata', ur: 'Extract PDF metadata.' }, desc: { en: "Read a PDF's title, author, dates, page count, and page dimensions, then download a JSON metadata report.", ur: 'Extract PDF metadata.' }, keywords: ['metadata', 'properties', 'author'] },
   { slug: 'pdf-to-markdown', category: 'advanced', status: 'working', icon: FileText, accepts: 'pdf', name: { en: 'PDF to Markdown', ur: 'PDF to Markdown' }, desc: { en: 'Export selectable PDF text with page headings in Markdown. Scanned pages need OCR; complex layout is not retained.', ur: 'Convert PDF to Markdown.' }, keywords: ['markdown', 'text', 'convert'] },
   { slug: 'pdf-to-json', category: 'advanced', status: 'working', icon: FileText, accepts: 'pdf', name: { en: 'PDF to JSON', ur: 'PDF to JSON' }, desc: { en: 'Export selectable page text and dimensions as JSON. Scanned pages need OCR; layout is not reconstructed.', ur: 'Convert PDF to JSON.' }, keywords: ['json', 'structure', 'convert'] },
@@ -349,7 +375,7 @@ export const LISTED_TOOLS = TOOLS.filter(
   (tool) => tool.status === 'working' && !TOOL_REDIRECTS[tool.slug],
 )
 
-export const POPULAR = ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf', 'pdf-to-jpg']
+export const POPULAR = ['merge-pdf', 'split-pdf', 'compress-pdf', 'sign-pdf', 'pdf-to-jpg', 'scan-to-pdf']
 
 export const getTool = (slug: string) => TOOLS.find((t) => t.slug === slug)
 

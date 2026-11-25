@@ -26,6 +26,8 @@
   <url><loc>https://pdfpilot5u.vercel.app/tools/add-page-numbers</loc></url>
   <url><loc>https://pdfpilot5u.vercel.app/tools/add-watermark</loc></url>
   <url><loc>https://pdfpilot5u.vercel.app/tools/jpg-to-pdf</loc></url>
+  <url><loc>https://pdfpilot5u.vercel.app/tools/scan-to-pdf</loc></url>
+  <url><loc>https://pdfpilot5u.vercel.app/tools/add-link-preview</loc></url>
   <url><loc>https://pdfpilot5u.vercel.app/tools/word-to-pdf</loc></url>
   <url><loc>https://pdfpilot5u.vercel.app/tools/excel-to-pdf</loc></url>
   <url><loc>https://pdfpilot5u.vercel.app/tools/powerpoint-to-pdf</loc></url>
@@ -60,6 +62,8 @@
   <url><loc>https://pdfpilot5u.vercel.app/tools/redact-pdf</loc></url>
   <url><loc>https://pdfpilot5u.vercel.app/tools/extract-images</loc></url>
   <url><loc>https://pdfpilot5u.vercel.app/tools/extract-tables</loc></url>
+  <url><loc>https://pdfpilot5u.vercel.app/tools/pdf-accessibility-checker</loc></url>
+  <url><loc>https://pdfpilot5u.vercel.app/tools/pdf-form-creator</loc></url>
   <url><loc>https://pdfpilot5u.vercel.app/tools/extract-metadata</loc></url>
   <url><loc>https://pdfpilot5u.vercel.app/tools/pdf-to-markdown</loc></url>
   <url><loc>https://pdfpilot5u.vercel.app/tools/pdf-to-json</loc></url>

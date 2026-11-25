@@ -1,12 +1,14 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Check, FileCheck2, Gift, Lock, LockKeyhole, MonitorSmartphone, ScanText, ShieldCheck, UserX } from 'lucide-react'
+import { Camera, Check, Download, FileCheck2, Gift, Lock, LockKeyhole, MonitorSmartphone, ScanText, ShieldCheck, UserX } from 'lucide-react'
 import { AllTools } from '#/components/AllTools'
 import { AdSenseUnit } from '#/components/AdSenseUnit'
+import { ThirdPartyAdUnit } from '#/components/ThirdPartyAdUnit'
 import { HeroUpload } from '#/components/HeroUpload'
 import { DownloadArt, HeroDecor, ProcessArt, Squiggle, StepArrow, UploadArt } from '#/components/Illustrations'
 import { ToolSearch } from '#/components/ToolSearch'
 import { type TKey, useI18n } from '#/lib/i18n'
 import { POPULAR, getTool } from '#/lib/tools'
+import { useEffect, useState } from 'react'
 
 export const Route = createFileRoute('/')({
   staticData: { pageId: 'pg_hM1qXe5rTz8C', funnel: { next: [] } },
@@ -18,6 +20,9 @@ export const Route = createFileRoute('/')({
         name: 'description',
         content: 'Merge, compress, split, sign, convert and edit PDFs in your browser. Optional AI tools send extracted text to Google only after consent; signing in is optional.',
       },
+      { property: 'og:url', content: 'https://pdfpilot5u.vercel.app/' },
+      { property: 'og:image', content: 'https://pdfpilot5u.vercel.app/brand/pwa-icon-512.png' },
+      { property: 'og:image:alt', content: 'PDF Pilot 5U PDF tools' },
       { property: 'og:title', content: 'PDF Pilot 5U — Everything you need to work with PDFs' },
       { property: 'og:description', content: 'Free PDF tools that run in your browser, with optional AI tools and clear consent before text is sent to Google.' },
     ],
@@ -32,14 +37,76 @@ function Home() {
       <ToolsSection />
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <AdSenseUnit slot={3} />
+        <ThirdPartyAdUnit slot={3} />
       </div>
       <Why />
       <How />
       <Security />
       <CapabilityStrip />
+      <AppDownloadAndReviews />
       <Pricing />
       <Faq />
     </>
+  )
+}
+
+function AppDownloadAndReviews() {
+  const [sent, setSent] = useState(false)
+  const [reviews, setReviews] = useState<Array<{ name: string; rating: number; review: string }>>([])
+  useEffect(() => {
+    try { setReviews(JSON.parse(localStorage.getItem('pdfpilot5u-reviews') ?? '[]') as Array<{ name: string; rating: number; review: string }>) } catch { setReviews([]) }
+  }, [])
+  const submit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    const next = [{ name: String(data.get('name') ?? '').trim(), rating: Number(data.get('rating') ?? 5), review: String(data.get('review') ?? '').trim() }, ...reviews].slice(0, 6)
+    localStorage.setItem('pdfpilot5u-reviews', JSON.stringify(next))
+    setReviews(next)
+    setSent(true)
+    event.currentTarget.reset()
+  }
+  return (
+    <section className="border-y border-line bg-card">
+      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-20 lg:grid-cols-2 lg:px-8">
+        <article className="rounded-card border border-line bg-paper p-7 shadow-[var(--shadow-soft)] md:p-9">
+          <div className="flex items-start justify-between gap-5">
+            <div className="grid size-16 place-items-center overflow-hidden rounded-[20px] bg-accent shadow-[var(--shadow-soft)] ring-4 ring-blush">
+              <img src="/brand/logo-icon.svg" alt="PDF Pilot 5U app logo" className="size-12" />
+            </div>
+            <span className="rounded-full border border-accent/20 bg-blush px-3 py-1 text-xs font-semibold text-accent-dark">Android APK</span>
+          </div>
+          <h2 className="mt-6 font-display text-2xl font-extrabold">Use PDF Pilot 5U on Android</h2>
+          <p className="mt-3 leading-relaxed text-muted">Download the official PDF Pilot 5U Android wrapper for quick access to browser-based PDF tools on your phone.</p>
+          <div className="mt-6 grid gap-3 rounded-2xl border border-line bg-card p-4 text-sm text-muted sm:grid-cols-2">
+            <div><span className="block font-semibold text-ink">Quick access</span>Browser-based PDF tools</div>
+            <div><span className="block font-semibold text-ink">Package</span>com.webapp.pdfpilot5u</div>
+          </div>
+          <a href="/downloads/pdf-pilot-5u.apk" download className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-full bg-accent px-6 font-semibold text-white hover:bg-accent-dark"><Download className="size-4" aria-hidden="true" /> Download APK</a>
+          <p className="mt-3 text-xs text-muted">APK package: com.webapp.pdfpilot5u · Android app download</p>
+        </article>
+        <article className="rounded-card border border-line bg-paper p-7 shadow-[var(--shadow-soft)] md:p-9">
+          <p className="text-sm font-semibold tracking-wide text-accent uppercase">Share your experience</p>
+          <h2 className="mt-2 font-display text-2xl font-extrabold">Leave a review</h2>
+          <p className="mt-3 leading-relaxed text-muted">Share your experience. Your review appears below on this browser with your name and rating; no email app is opened.</p>
+          <form onSubmit={submit} className="mt-5 grid gap-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <input required name="name" maxLength={100} placeholder="Your name" aria-label="Your name" className="min-h-11 rounded-xl border border-line bg-card px-3 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" />
+              <input required type="email" name="email" maxLength={254} placeholder="Email address" aria-label="Email address" className="min-h-11 rounded-xl border border-line bg-card px-3 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            </div>
+            <select name="rating" aria-label="Rating" className="min-h-11 rounded-xl border border-line bg-card px-3 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"><option value="5">★★★★★ 5 stars</option><option value="4">★★★★☆ 4 stars</option><option value="3">★★★☆☆ 3 stars</option><option value="2">★★☆☆☆ 2 stars</option><option value="1">★☆☆☆☆ 1 star</option></select>
+            <textarea required name="review" maxLength={1000} rows={3} placeholder="Write your review" aria-label="Write your review" className="rounded-xl border border-line bg-card px-3 py-3 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            <button type="submit" className="min-h-11 rounded-full bg-accent px-5 font-semibold text-white hover:bg-accent-dark">Submit review</button>
+            {sent && <p role="status" className="text-sm font-semibold text-accent-dark">Your review is now shown below.</p>}
+          </form>
+          {reviews.length > 0 && <div className="mt-6 space-y-3" aria-label="User reviews">
+            {reviews.map((item, index) => <article key={`${item.name}-${index}`} className="rounded-2xl border border-accent/20 bg-blush p-4">
+              <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-full bg-accent text-white" aria-hidden="true"><svg viewBox="0 0 24 24" className="size-5" fill="currentColor"><path d="m12 2 2.8 6.1 6.7.8-5 4.6 1.4 6.6-5.9-3.4-5.9 3.4 1.4-6.6-5-4.6 6.7-.8L12 2Z" /></svg></span><div><p className="font-semibold">{item.name}</p><p className="text-sm text-accent" aria-label={`${item.rating} out of 5 stars`}>{'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}</p></div></div>
+              <p className="mt-3 leading-relaxed text-muted">{item.review}</p>
+            </article>)}
+          </div>}
+        </article>
+      </div>
+    </section>
   )
 }
 
@@ -82,6 +149,7 @@ function Hero() {
           <ToolSearch className="mx-auto mt-8 max-w-xl" />
         </div>
         <AdSenseUnit slot={1} />
+        <ThirdPartyAdUnit slot={2} />
         <div className="animate-fade-up mt-8" style={stagger(440)}>
           <p className="text-sm font-semibold text-muted">{t('popular.title')}</p>
           <div className="mt-3 flex flex-wrap justify-center gap-2">
@@ -105,6 +173,16 @@ function Hero() {
             })}
           </div>
         </div>
+        <Link
+          to="/tools/$slug"
+          params={{ slug: 'scan-to-pdf' }}
+          className="animate-fade-up mx-auto mt-10 block max-w-3xl rounded-[28px] border-2 border-accent/25 bg-gradient-to-br from-blush via-card to-paper p-5 text-left shadow-[var(--shadow-soft)] transition hover:-translate-y-1 hover:border-accent/50 hover:shadow-lg sm:p-7"
+          style={stagger(860)}
+        >
+          <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-accent text-white shadow-md"><Camera className="size-7" aria-hidden="true" /></span>
+          <span className="min-w-0 flex-1"><span className="block text-xs font-bold tracking-[.14em] text-accent-dark uppercase">New · Featured scanner</span><span className="mt-1 block font-display text-2xl font-extrabold md:text-3xl">Turn your phone camera into a PDF scanner</span><span className="mt-2 block leading-relaxed text-muted">Capture clean document pages, arrange them, and download one PDF—all privately in your browser.</span></span>
+          <span className="shrink-0 text-lg font-bold text-accent" aria-hidden="true">→</span>
+        </Link>
       </div>
     </section>
   )
@@ -116,6 +194,7 @@ function ToolsSection() {
     <section id="tools" className="scroll-mt-20 border-t border-line">
       <div className="mx-auto max-w-7xl px-5 py-20 md:py-24 lg:px-8">
         <AdSenseUnit slot={2} />
+        <ThirdPartyAdUnit slot={1} />
         <div data-reveal className="max-w-2xl">
           <Eyebrow>{t('nav.tools')}</Eyebrow>
           <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-balance md:text-4xl">{t('all.title')}</h2>

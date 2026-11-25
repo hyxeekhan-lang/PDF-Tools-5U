@@ -67,6 +67,19 @@ These screenshots show the live interface with no user documents selected.
 2. Search for a tool or choose one from the library, then select your file.
 3. Review the result and download it. For AI tools, approve the consent prompt before extracted text is sent to Google Gemini.
 
+## Chrome extension
+
+PDF Pilot 5U also includes a lightweight Manifest V3 Chrome extension in [`extension/`](./extension). It provides quick access to the live tools—All Tools, Merge, Split, Compress, and OCR—plus a right-click shortcut. PDF processing remains on the website; the extension does not copy or upload documents.
+
+### Install the extension locally
+
+1. Download the latest `pdf-pilot-5u-chrome-extension.zip` from [GitHub Releases](https://github.com/hyxeekhan-lang/PDF-Tools-5U/releases).
+2. Extract the ZIP file.
+3. Open `chrome://extensions` and enable **Developer mode**.
+4. Click **Load unpacked** and select the extracted `extension` folder.
+
+The Chrome Web Store publication is separate and requires a Chrome Web Store developer account and review.
+
 ## What to expect
 
 - Most PDF tools process source files in your browser. Optional AI sends extracted text to Google Gemini only after your explicit consent; a registered account is not required.

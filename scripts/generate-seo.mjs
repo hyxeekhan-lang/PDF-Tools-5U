@@ -53,4 +53,4 @@ const publisherId = process.env.ADSENSE_PUBLISHER_ID?.trim()
 if (publisherId) {
   if (!/^pub-\d{16}$/.test(publisherId)) throw new Error('ADSENSE_PUBLISHER_ID must use the format pub- followed by 16 digits.')
   await writeFile('public/ads.txt', `google.com, ${publisherId}, DIRECT, f08c47fec0942fa0\n`, 'utf8')
-}
+} else await writeFile('public/ads.txt', '# Google AdSense is disabled until a verified publisher ID is configured.\n', 'utf8')

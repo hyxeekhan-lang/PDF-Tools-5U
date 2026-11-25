@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff7f5"/>
+      <stop offset="1" stop-color="#fbe3df"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#b42318" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="500" rx="28" fill="url(#bg)"/>
+  <circle cx="850" cy="250" r="210" fill="#d92d20" opacity=".08"/>
+  <circle cx="940" cy="80" r="100" fill="#d92d20" opacity=".06"/>
+  <g transform="translate(90 112)" filter="url(#shadow)">
+    <rect width="170" height="170" rx="38" fill="#d92d20"/>
+    <path d="M50 38h58l32 32v65a16 16 0 0 1-16 16H50a16 16 0 0 1-16-16V54a16 16 0 0 1 16-16Z" fill="none" stroke="#fff" stroke-width="8"/>
+    <path d="M108 38v25a10 10 0 0 0 10 10h22M60 92h56M60 116h42" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="320" y="205" fill="#101828" font-family="Arial, sans-serif" font-size="62" font-weight="700">PDF Pilot 5U</text>
+  <text x="324" y="270" fill="#667085" font-family="Arial, sans-serif" font-size="29">Simple PDF tools for everyday documents</text>
+  <g transform="translate(324 320)">
+    <rect width="132" height="48" rx="24" fill="#d92d20"/>
+    <text x="66" y="32" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="19" font-weight="700">MERGE</text>
+    <rect x="146" width="132" height="48" rx="24" fill="#d92d20"/>
+    <text x="212" y="32" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="19" font-weight="700">EDIT</text>
+    <rect x="292" width="154" height="48" rx="24" fill="#d92d20"/>
+    <text x="369" y="32" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="19" font-weight="700">CONVERT</text>
+  </g>
+</svg>

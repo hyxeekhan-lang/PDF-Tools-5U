@@ -26,6 +26,9 @@ if ('serviceWorker' in navigator) {
 const FONTS =
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Dancing+Script:wght@600&family=Great+Vibes&family=Caveat:wght@600&display=swap'
 
+const SITE_URL = import.meta.env.VITE_PUBLIC_SITE_URL || 'https://pdfpilot5u.vercel.app'
+const SOCIAL_IMAGE = `${SITE_URL}/brand/pwa-icon-512.png`
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -34,6 +37,18 @@ export const Route = createRootRoute({
       { title: 'PDF Pilot 5U — Everything you need to work with PDFs' },
       { name: 'theme-color', content: '#D92D20' },
       { name: 'color-scheme', content: 'light dark' },
+      { name: 'description', content: 'PDF Pilot 5U provides browser-based PDF tools to merge, split, compress, convert, edit, sign and organize PDF files.' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:site_name', content: 'PDF Pilot 5U' },
+      { property: 'og:title', content: 'PDF Pilot 5U — Free browser-based PDF tools' },
+      { property: 'og:description', content: 'Merge, split, compress, convert, edit and sign PDF files directly in your browser.' },
+      { property: 'og:url', content: SITE_URL },
+      { property: 'og:image', content: SOCIAL_IMAGE },
+      { property: 'og:image:alt', content: 'PDF Pilot 5U PDF tools' },
+      { name: 'twitter:card', content: 'summary' },
+      { name: 'twitter:title', content: 'PDF Pilot 5U — Free browser-based PDF tools' },
+      { name: 'twitter:description', content: 'Work with PDF files in your browser using PDF Pilot 5U.' },
+      { name: 'twitter:image', content: SOCIAL_IMAGE },
     ],
     links: [
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

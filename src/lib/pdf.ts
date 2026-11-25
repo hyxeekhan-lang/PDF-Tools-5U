@@ -1,4 +1,4 @@
-import { PDFDocument, PDFName, StandardFonts, degrees, rgb } from 'pdf-lib'
+import { PDFArray, PDFDocument, PDFName, PDFString, StandardFonts, degrees, rgb } from 'pdf-lib'
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
 
 export const MAX_BYTES = 100 * 1024 * 1024
@@ -1035,6 +1035,29 @@ export async function addTextToPdf(file: File, text: string, size: number, onPro
   return [{ name: `${baseName(file.name)}-edited.pdf`, blob: toBlob(await doc.save()) }]
 }
 
+export async function addLinkPreviewToPdf(file: File, url: string, onProgress: Progress) {
+  const value = url.trim()
+  if (!/^https?:\/\/[^\s]+$/i.test(value)) throw err('Enter a valid http or https URL.', 'درست http یا https URL درج کریں۔')
+  const doc = await loadPdf(file)
+  const font = await doc.embedFont(StandardFonts.Helvetica)
+  const pages = doc.getPages()
+  pages.forEach((page, index) => {
+    const width = Math.min(260, page.getWidth() - 72)
+    const height = 48
+    const x = 36
+    const y = 36
+    page.drawRectangle({ x, y, width, height, color: rgb(0.96, 0.97, 1), borderColor: rgb(0.85, 0.88, 0.94), borderWidth: 1 })
+    page.drawText('OPEN LINK', { x: x + 12, y: y + 28, size: 8, font, color: rgb(0.85, 0.12, 0.08) })
+    page.drawText(value, { x: x + 12, y: y + 12, size: 9, font, color: rgb(0.08, 0.12, 0.2), maxWidth: width - 24 })
+    const annotation = doc.context.obj({ Type: 'Annot', Subtype: 'Link', Rect: [x, y, x + width, y + height], Border: [0, 0, 0], A: { Type: 'Action', S: 'URI', URI: PDFString.of(value) } })
+    const annotations = PDFArray.withContext(doc.context)
+    annotations.push(annotation)
+    page.node.set(PDFName.of('Annots'), annotations)
+    onProgress((index + 1) / pages.length)
+  })
+  return [{ name: `${baseName(file.name)}-link-preview.pdf`, blob: toBlob(await doc.save()) }]
+}
+
 export async function highlightTextPdf(file: File, phrase: string, onProgress: Progress) {
   const search = phrase.trim().toLocaleLowerCase()
   if (!search) throw err('Enter a word or phrase to highlight.', 'Highlight کرنے کے لیے لفظ یا عبارت درج کریں۔')
@@ -1202,6 +1225,65 @@ export async function extractMetadata(file: File, onProgress: Progress) {
     }),
   }
   return [{ name: `${baseName(file.name)}-metadata.json`, blob: new Blob([JSON.stringify(value, null, 2)], { type: 'application/json;charset=utf-8' }) }]
+}
+
+export async function checkPdfAccessibility(file: File, onProgress: Progress) {
+  const pdf = await openPdfjs(file)
+  const pages: Array<{ page: number; hasSelectableText: boolean; characterCount: number; width: number; height: number }> = []
+  try {
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+      onProgress((pageNumber - 1) / pdf.numPages, `Checking page ${pageNumber} of ${pdf.numPages}`)
+      const page = await pdf.getPage(pageNumber)
+      const viewport = page.getViewport({ scale: 1 })
+      const content = await page.getTextContent()
+      const text = content.items
+        .filter((item): item is typeof item & { str: string } => 'str' in item && typeof item.str === 'string')
+        .map((item) => item.str)
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+      pages.push({ page: pageNumber, hasSelectableText: Boolean(text), characterCount: text.length, width: Math.round(viewport.width), height: Math.round(viewport.height) })
+      page.cleanup()
+    }
+  } finally {
+    await pdf.destroy()
+  }
+  const issues = pages.flatMap((page) => page.hasSelectableText ? [] : [`Page ${page.page} has no selectable text; it may be scanned or image-only.`])
+  const report = {
+    fileName: file.name,
+    pageCount: pages.length,
+    checks: {
+      readable: true,
+      selectableText: pages.every((page) => page.hasSelectableText),
+      consistentPageSizes: new Set(pages.map((page) => `${page.width}x${page.height}`)).size <= 1,
+      taggedPdf: 'Not verified by this browser checker',
+      languageMetadata: 'Not verified by this browser checker',
+    },
+    issues,
+    pages,
+    note: 'This is a practical browser-level check, not a formal PDF/UA certification. Review the report with an accessibility specialist for compliance decisions.',
+  }
+  return [{ name: `${baseName(file.name)}-accessibility-report.json`, blob: new Blob([JSON.stringify(report, null, 2)], { type: 'application/json;charset=utf-8' }) }]
+}
+
+export async function createPdfForm(file: File, fields: Array<{ name: string; label: string }>, onProgress: Progress) {
+  if (!fields.length) throw err('Add at least one form field.', 'کم از کم ایک فارم فیلڈ شامل کریں۔')
+  const doc = await loadPdf(file)
+  const form = doc.getForm()
+  const page = doc.getPages()[0]
+  const { width } = page.getSize()
+  const fieldWidth = Math.min(260, width - 80)
+  fields.slice(0, 8).forEach((field, index) => {
+    const safeName = field.name.trim().replace(/[^a-zA-Z0-9_.-]+/g, '_') || `field_${index + 1}`
+    const textField = form.createTextField(safeName)
+    textField.setText('')
+    textField.addToPage(page, { x: 40, y: Math.max(40, page.getHeight() - 90 - index * 55), width: fieldWidth, height: 28, borderWidth: 1, borderColor: rgb(0.75, 0.75, 0.75), textColor: rgb(0.08, 0.08, 0.12), backgroundColor: rgb(1, 1, 1) })
+    page.drawText(field.label.trim().slice(0, 120) || safeName, { x: 40, y: Math.max(74, page.getHeight() - 58 - index * 55), size: 11, color: rgb(0.08, 0.08, 0.12) })
+  })
+  onProgress(0.8, 'Saving fillable PDF')
+  const bytes = await doc.save()
+  onProgress(1, 'Done')
+  return [{ name: `${baseName(file.name)}-fillable.pdf`, blob: toBlob(bytes) }]
 }
 
 export async function pdfToPng(file: File, dpi: number, onProgress: Progress) {

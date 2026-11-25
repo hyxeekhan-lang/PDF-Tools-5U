@@ -1,15 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-const CONSENT_KEY = 'pdfpilot5u-cookie-consent-v2'
-const units = {
-  1: { key: '201b4d97cd029236911f9ed306872b0c', width: 468, height: 60 },
-  2: { key: '3ff7854a7fd2bc7238f42d56110b052e', width: 300, height: 250 },
-  3: { key: '2831834a178db11caa5b4182c5fb1c28', width: 728, height: 90 },
-} as const
+declare global {
+  interface Window { adsbygoogle?: unknown[] }
+}
+
+const CONSENT_KEY = 'pdfpilot5u-cookie-consent-v3'
+const publisherId = import.meta.env.VITE_ADSENSE_PUBLISHER_ID?.trim() ?? ''
+const slots = { 1: import.meta.env.VITE_ADSENSE_SLOT_ID_1?.trim() ?? '', 2: import.meta.env.VITE_ADSENSE_SLOT_ID_2?.trim() ?? '', 3: import.meta.env.VITE_ADSENSE_SLOT_ID_3?.trim() ?? '' } as const
+const configured = /^pub-\d{16}$/.test(publisherId) && Object.values(slots).every((slot) => /^\d+$/.test(slot))
 
 export function AdSenseUnit({ slot }: { slot: 1 | 2 | 3 }) {
   const [allowed, setAllowed] = useState(false)
-  const unit = units[slot]
+  const adRef = useRef<HTMLModElement>(null)
+  const hasSlot = configured && Boolean(slots[slot])
 
   useEffect(() => {
     const update = () => setAllowed(window.localStorage.getItem(CONSENT_KEY) === 'all')
@@ -22,20 +25,34 @@ export function AdSenseUnit({ slot }: { slot: 1 | 2 | 3 }) {
     }
   }, [])
 
+  useEffect(() => {
+    if (!allowed || !hasSlot || document.querySelector('script[data-pdfpilot-adsense]')) return
+    const script = document.createElement('script')
+    script.async = true
+    script.crossOrigin = 'anonymous'
+    script.dataset.pdfpilotAdsense = 'true'
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}`
+    document.head.appendChild(script)
+  }, [allowed, hasSlot])
+
+  useEffect(() => {
+    if (!allowed || !hasSlot || !adRef.current) return
+    try {
+      window.adsbygoogle = window.adsbygoogle ?? []
+      window.adsbygoogle.push({})
+    } catch (error) {
+      console.warn('Google AdSense was not ready for this slot.', error)
+    }
+  }, [allowed, hasSlot])
+
   return (
     <aside className="my-10 flex min-h-24 items-center justify-center overflow-hidden text-center" aria-label="Advertisements">
       <div>
         <span className="mb-2 block text-xs uppercase tracking-wider text-muted">Advertisements</span>
-        {allowed ? (
-          <iframe
-            title={`Advertisement ${slot}`}
-            className="mx-auto block max-w-full border-0"
-            style={{ width: `min(100%, ${unit.width}px)`, height: unit.height }}
-            sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-            srcDoc={`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;display:flex;justify-content:center;overflow:hidden"><script>var atOptions={key:'${unit.key}',format:'iframe',height:${unit.height},width:${unit.width},params:{}};<\/script><script async data-cfasync="false" src="https://bicea.org/22/${unit.key}"><\/script></body></html>`}
-          />
+        {hasSlot && allowed ? (
+          <ins ref={adRef} className="adsbygoogle block min-h-24 overflow-hidden" style={{ display: 'block' }} data-ad-client={publisherId} data-ad-slot={slots[slot]} data-ad-format="auto" data-full-width-responsive="true" />
         ) : (
-          <span className="block text-xs text-muted">Accept all cookies to load advertisements.</span>
+          <span className="block text-xs text-muted">Advertisements are disabled until an approved Google AdSense configuration is provided.</span>
         )}
       </div>
     </aside>

@@ -14,6 +14,7 @@ import {
   addHeaderFooter,
   addImageToPdf,
   addTextToPdf,
+  addLinkPreviewToPdf,
   addWatermark,
   compressPdf,
   comparePdfText,
@@ -38,6 +39,8 @@ import {
   pdfToHtml,
   pdfToJson,
   pdfToCsv,
+  checkPdfAccessibility,
+  createPdfForm,
   pdfToMarkdown,
   pdfToPng,
   pdfToPowerpoint,
@@ -539,6 +542,26 @@ export function AddTextOptions({ files, run }: OptionsProps) {
   )
 }
 
+export function AddLinkPreviewOptions({ files, run }: OptionsProps) {
+  const { tr } = useI18n()
+  const [url, setUrl] = useState('https://')
+  let host = 'Your link preview'
+  try { host = new URL(url).hostname || host } catch { /* live preview remains a safe placeholder */ }
+  return (
+    <Panel>
+      <Field label={tr('Website URL', 'ویب سائٹ URL')}>
+        <input className={inputClass} type="url" value={url} onChange={(event) => setUrl(event.target.value)} placeholder="https://example.com" maxLength={500} />
+      </Field>
+      <div className="flex items-center gap-3 rounded-2xl border border-line bg-blush p-4">
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent text-white" aria-hidden="true">↗</span>
+        <div className="min-w-0"><p className="font-semibold">{host}</p><p className="truncate text-sm text-muted">{url === 'https://' ? 'Paste a URL to preview it here' : url}</p></div>
+      </div>
+      <p className="text-sm text-muted">A clickable link card is added to the bottom-left of every PDF page. The website preview is generated privately from the URL; no page content is fetched.</p>
+      <ProcessButton disabled={!/^https?:\/\/[^\s]+$/i.test(url.trim())} onClick={() => run((p) => addLinkPreviewToPdf(files[0], url, p))} label={tr('Add link preview', 'لنک پری ویو شامل کریں')} />
+    </Panel>
+  )
+}
+
 export function DrawOptions({ files, run }: OptionsProps) {
   const { tr } = useI18n()
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -781,6 +804,25 @@ export function PdfToCsvOptions({ files, run }: OptionsProps) {
       <ProcessButton onClick={() => run((p) => pdfToCsv(files[0], p))} label={tr('Export CSV', 'CSV بنائیں')} />
     </Panel>
   )
+}
+
+export function AccessibilityCheckerOptions({ files, run }: OptionsProps) {
+  const { tr } = useI18n()
+  return <Panel>
+    <p className="text-sm text-muted">{tr('Creates a browser-level JSON report for selectable text, page dimensions, and image-only pages. It is not formal PDF/UA certification.', 'یہ براؤزر کی سطح پر accessibility رپورٹ بناتا ہے؛ یہ رسمی PDF/UA certification نہیں ہے۔')}</p>
+    <ProcessButton onClick={() => run((p) => checkPdfAccessibility(files[0], p))} label={tr('Check accessibility', 'Accessibility چیک کریں')} />
+  </Panel>
+}
+
+export function PdfFormCreatorOptions({ files, run }: OptionsProps) {
+  const { tr } = useI18n()
+  const [fields, setFields] = useState(['Name', 'Email', 'Comments'])
+  return <Panel>
+    <p className="text-sm text-muted">{tr('Adds up to eight fillable text fields to the first page of your PDF. Keep the original file because fields are placed on a new copy.', 'پہلے صفحے پر زیادہ سے زیادہ آٹھ قابلِ تحریر text fields شامل کریں۔')}</p>
+    <div className="space-y-2">{fields.map((field, index) => <input key={index} className={inputClass} value={field} maxLength={120} aria-label={`Form field ${index + 1} label`} onChange={(event) => setFields((current) => current.map((item, itemIndex) => itemIndex === index ? event.target.value : item))} />)}</div>
+    <button type="button" className="min-h-9 rounded-full border border-line px-3 text-sm" onClick={() => fields.length < 8 && setFields((current) => [...current, `Field ${current.length + 1}`])} disabled={fields.length >= 8}>{tr('Add field', 'فیلڈ شامل کریں')}</button>
+    <ProcessButton disabled={!fields.some((field) => field.trim())} onClick={() => run((p) => createPdfForm(files[0], fields.map((label, index) => ({ name: `field_${index + 1}`, label })), p))} label={tr('Create fillable PDF', 'Fillable PDF بنائیں')} />
+  </Panel>
 }
 
 export function ReorderOptions({ files, run }: OptionsProps) {

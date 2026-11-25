@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.webapp.pdfpilot5u",
+      "sha256_cert_fingerprints": [
+        "51:95:F9:2D:99:6B:FC:32:70:0B:5D:7B:7D:12:E2:33:60:BE:80:23:BD:0C:47:98:04:5C:6A:EA:47:19:28:8E"
+      ]
+    }
+  }
+]

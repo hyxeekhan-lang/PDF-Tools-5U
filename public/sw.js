@@ -1,5 +1,8 @@
+const CACHE = 'pdfpilot5u-shell-v1'
+const SHELL = ['/', '/tools', '/manifest.webmanifest', '/brand/logo-icon.svg', '/brand/pwa-icon-192.png']
+
 self.addEventListener('install', (event) => {
-  event.waitUntil(self.skipWaiting())
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting()))
 })
 
 self.addEventListener('activate', (event) => {
@@ -7,7 +10,18 @@ self.addEventListener('activate', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.mode === 'navigate') {
-    event.respondWith(fetch(event.request))
-  }
+  if (event.request.method !== 'GET') return
+  event.respondWith((async () => {
+    try {
+      const response = await fetch(event.request)
+      if (response.ok && new URL(event.request.url).origin === self.location.origin) {
+        const cache = await caches.open(CACHE)
+        await cache.put(event.request, response.clone())
+      }
+      return response
+    } catch {
+      const cached = await caches.match(event.request)
+      return cached || caches.match('/') || Response.error()
+    }
+  })())
 })
