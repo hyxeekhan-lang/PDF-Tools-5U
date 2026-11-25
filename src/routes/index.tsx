@@ -159,11 +159,11 @@ function Hero() {
         <Link
           to="/tools/$slug"
           params={{ slug: 'scan-to-pdf' }}
-          className="animate-fade-up mx-auto mt-8 flex max-w-xl items-center gap-4 rounded-2xl border border-accent/25 bg-blush p-4 text-left shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-accent/50"
+          className="animate-fade-up mx-auto mt-10 block max-w-3xl rounded-[28px] border-2 border-accent/25 bg-gradient-to-br from-blush via-card to-paper p-5 text-left shadow-[var(--shadow-soft)] transition hover:-translate-y-1 hover:border-accent/50 hover:shadow-lg sm:p-7"
           style={stagger(860)}
         >
-          <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-accent text-white"><Camera className="size-6" aria-hidden="true" /></span>
-          <span className="min-w-0 flex-1"><span className="block text-xs font-bold tracking-wide text-accent-dark uppercase">New featured tool</span><span className="mt-0.5 block font-display text-lg font-bold">Scan documents with your camera</span><span className="mt-0.5 block text-sm text-muted">Capture pages and create a PDF privately in your browser.</span></span>
+          <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-accent text-white shadow-md"><Camera className="size-7" aria-hidden="true" /></span>
+          <span className="min-w-0 flex-1"><span className="block text-xs font-bold tracking-[.14em] text-accent-dark uppercase">New · Featured scanner</span><span className="mt-1 block font-display text-2xl font-extrabold md:text-3xl">Turn your phone camera into a PDF scanner</span><span className="mt-2 block leading-relaxed text-muted">Capture clean document pages, arrange them, and download one PDF—all privately in your browser.</span></span>
           <span className="shrink-0 text-lg font-bold text-accent" aria-hidden="true">→</span>
         </Link>
       </div>
