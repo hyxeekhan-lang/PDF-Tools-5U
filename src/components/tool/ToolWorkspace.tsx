@@ -1,11 +1,11 @@
-import { ArrowDown, ArrowUp, CloudUpload, Download, FileText, Image as ImageIcon, Plus, RotateCcw, ShieldCheck, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, CloudUpload, Download, FileText, Image as ImageIcon, LoaderCircle, Plus, RotateCcw, ShieldCheck, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { saveFiles, takePendingFiles } from '#/lib/files-store'
 import { useI18n } from '#/lib/i18n'
 import { type Bilingual, type Output, ToolError, downloadBlob, formatBytes, validateFile, zipOutputs } from '#/lib/pdf'
 import type { Tool } from '#/lib/tools'
 import { DropFrame } from '../DropFrame'
-import { recordProcessing } from '#/lib/supabase'
+import { recordProcessing } from '#/lib/neon'
 import { SignOptions } from './SignOptions'
 import { GeminiOptions } from './GeminiOptions'
 import {
@@ -464,20 +464,32 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
       {errorList}
 
       {state.phase === 'processing' && (
-        <div className="animate-fade-up rounded-card border border-line bg-card p-6" aria-live="polite">
-          <div className="flex items-center justify-between text-sm font-semibold">
-            <span>
-              {t('page.processing')} {state.label && <span className="font-normal text-muted" dir="ltr">{state.label}</span>}
+        <div className="animate-fade-up rounded-card border border-accent/15 bg-card p-6 shadow-[var(--shadow-soft)] md:p-7" aria-live="polite">
+          <div className="flex items-start gap-4">
+            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-accent text-white shadow-sm">
+              <LoaderCircle className="size-6 animate-spin" aria-hidden="true" />
             </span>
-            <span className="tabular-nums" dir="ltr">
-              {Math.round(state.fraction * 100)}%
-            </span>
-          </div>
-          <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-blush" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(state.fraction * 100)}>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="font-display text-lg font-bold">{t('page.processing')}</h2>
+                  <p className="mt-1 text-sm text-muted">Your file is being processed securely in this browser.</p>
+                </div>
+                <span className="rounded-full bg-blush px-3 py-1 text-sm font-bold tabular-nums text-accent" dir="ltr">
+                  {Math.round(state.fraction * 100)}%
+                </span>
+              </div>
+              <div className="mt-5 h-3 overflow-hidden rounded-full bg-blush" role="progressbar" aria-label="Processing progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(state.fraction * 100)}>
             <div
               className="progress-shimmer relative h-full origin-left overflow-hidden rounded-full bg-gradient-to-r from-accent to-accent-dark transition-transform duration-300 ease-[var(--ease-out)] rtl:origin-right rtl:bg-gradient-to-l"
               style={{ transform: `scaleX(${Math.max(0.03, state.fraction)})` }}
             />
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted">
+                <span>{state.label ? `Step: ${state.label}` : 'Preparing your result…'}</span>
+                <span>Keep this tab open</span>
+              </div>
+            </div>
           </div>
         </div>
       )}

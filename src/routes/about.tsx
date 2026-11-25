@@ -54,7 +54,7 @@ function About() {
           contracts, IDs and bank statements pass through a machine you don’t control.
         </p>
         <p>
-          Most tools run locally in your browser. Account features and guest sessions use Supabase, and optional AI
+          Most tools run locally in your browser. Account features use Neon, and optional AI
           document tools send extracted text to Google Gemini only after you give explicit consent. AI tools do not
           require a registered account. Modern browsers are powerful enough to
           do much of the remaining work themselves. PDF Pilot 5U uses open-source

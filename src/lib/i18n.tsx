@@ -69,7 +69,7 @@ const en = {
 
   'sec.eyebrow': 'Security & privacy',
   'sec.title': 'Local processing, with clear AI consent',
-  'sec.body': 'Most PDF tools run in your browser using open-source libraries. Account information is handled by Supabase. AI tools send extracted document text to Google Gemini only after your explicit consent; a guest Supabase session may be created automatically, but a registered account is not required.',
+  'sec.body': 'Most PDF tools run in your browser using open-source libraries. Account information is handled by Neon Auth. AI tools send extracted document text to Google Gemini only after your explicit consent; no account is required, and requests are rate-limited by IP.',
   'sec.1': 'Source PDFs stay in your browser; AI sends extracted text only after you consent',
   'sec.2': 'Local PDF results are created in your browser; AI responses use text sent to Gemini with your consent',
   'sec.3': '“My Files” keeps recent results only in this browser, and you can clear them anytime',
@@ -102,7 +102,7 @@ const en = {
 
   'faq.title': 'Frequently asked questions',
   'faq.1.q': 'Are my files uploaded to a server?',
-  'faq.1.a': 'Local PDF tools process files in this browser. AI tools send extracted text to Google Gemini only after your explicit consent. A guest Supabase session may be created automatically; no registered account is required.',
+  'faq.1.a': 'Local PDF tools process files in this browser. AI tools send extracted text to Google Gemini only after your explicit consent. AI does not require an account; requests are rate-limited by IP.',
   'faq.2.q': 'Do I need an account?',
   'faq.2.a': 'No registered account is required to use local PDF tools or AI tools. AI processing requires your explicit consent; sign in only if you want account features.',
   'faq.3.q': 'Why are some tools marked “Coming soon”?',
@@ -124,7 +124,6 @@ const en = {
   'footer.contact': 'Contact',
   'footer.privacy': 'Privacy Policy',
   'footer.terms': 'Terms of Service',
-  'footer.refund': 'Refund Policy',
   'footer.cookies': 'Cookie Policy',
   'footer.help': 'Help Center',
   'footer.blog': 'Blog',
@@ -237,7 +236,7 @@ const ur: Record<Key, string> = {
 
   'sec.eyebrow': 'سیکیورٹی اور رازداری',
   'sec.title': 'مقامی پروسیسنگ، AI کے لیے واضح اجازت',
-  'sec.body': 'زیادہ تر PDF ٹولز آپ کے براؤزر میں چلتے ہیں۔ اکاؤنٹ کی معلومات Supabase سنبھالتا ہے۔ AI ٹولز آپ کی واضح اجازت کے بعد ہی نکالا ہوا متن Google Gemini کو بھیجتے ہیں؛ ضرورت پڑنے پر Supabase کا مہمان سیشن خود بنتا ہے، مگر رجسٹرڈ اکاؤنٹ ضروری نہیں۔',
+  'sec.body': 'زیادہ تر PDF ٹولز آپ کے براؤزر میں چلتے ہیں۔ اکاؤنٹ کی معلومات Neon Auth سنبھالتا ہے۔ AI ٹولز آپ کی واضح اجازت کے بعد ہی نکالا ہوا متن Google Gemini کو بھیجتے ہیں؛ اکاؤنٹ ضروری نہیں اور درخواستیں IP کے مطابق محدود ہیں۔',
   'sec.1': 'اصل PDF براؤزر میں رہتی ہے؛ AI صرف اجازت کے بعد نکالا ہوا متن بھیجتا ہے',
   'sec.2': 'مقامی PDF نتائج براؤزر میں بنتے ہیں؛ AI جواب آپ کی اجازت سے Gemini کو بھیجے گئے متن سے بنتا ہے',
   'sec.3': '“میری فائلیں” حالیہ نتائج صرف اسی براؤزر میں رکھتا ہے، جنہیں آپ کبھی بھی حذف کر سکتے ہیں',
@@ -270,7 +269,7 @@ const ur: Record<Key, string> = {
 
   'faq.title': 'اکثر پوچھے جانے والے سوالات',
   'faq.1.q': 'کیا میری فائلیں سرور پر اپ لوڈ ہوتی ہیں؟',
-  'faq.1.a': 'مقامی PDF ٹولز فائلیں اسی براؤزر میں پروسیس کرتے ہیں۔ AI ٹولز واضح اجازت کے بعد ہی منتخب متن Google Gemini کو بھیجتے ہیں۔ Supabase کا مہمان سیشن خود بن سکتا ہے؛ رجسٹرڈ اکاؤنٹ ضروری نہیں۔',
+  'faq.1.a': 'مقامی PDF ٹولز فائلیں اسی براؤزر میں پروسیس کرتے ہیں۔ AI ٹولز واضح اجازت کے بعد ہی منتخب متن Google Gemini کو بھیجتے ہیں۔ AI کے لیے اکاؤنٹ ضروری نہیں؛ درخواستیں IP کے مطابق محدود ہیں۔',
   'faq.2.q': 'کیا اکاؤنٹ ضروری ہے؟',
   'faq.2.a': 'مقامی PDF اور AI ٹولز کے لیے رجسٹرڈ اکاؤنٹ ضروری نہیں۔ AI پروسیسنگ کے لیے آپ کی واضح اجازت لازم ہے؛ اکاؤنٹ فیچرز کے لیے چاہیں تو سائن اِن کریں۔',
   'faq.3.q': 'کچھ ٹولز پر “جلد آ رہا ہے” کیوں لکھا ہے؟',
@@ -292,7 +291,6 @@ const ur: Record<Key, string> = {
   'footer.contact': 'رابطہ',
   'footer.privacy': 'رازداری کی پالیسی',
   'footer.terms': 'شرائط و ضوابط',
-  'footer.refund': 'رقم کی واپسی کی پالیسی',
   'footer.cookies': 'کوکی پالیسی',
   'footer.help': 'مدد مرکز',
   'footer.blog': 'بلاگ',
@@ -373,7 +371,10 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       lang,
       setLang,
       t: (k) => dict[lang][k] ?? en[k],
-      pick: (v) => v[lang],
+      // Some legacy catalog entries contain literal question marks after an
+      // old encoding conversion. Fall back to verified English copy instead
+      // of showing broken placeholders in the UI.
+      pick: (v) => lang === 'ur' && /\?{2,}/.test(String(v.ur)) ? v.en : v[lang],
       tr: (enText, urText) => (lang === 'ur' ? urText : enText),
     }),
     [lang, setLang],

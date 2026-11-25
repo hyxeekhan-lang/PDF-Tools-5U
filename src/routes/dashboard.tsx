@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { PageShell } from '#/components/PageShell'
 import { getTool } from '#/lib/tools'
 import { formatBytes } from '#/lib/pdf'
-import { getSupabase, type FavoriteRecord, type ProcessingRecord } from '#/lib/supabase'
+import { getNeonClient, type FavoriteRecord, type ProcessingRecord } from '#/lib/neon'
 
 type DashboardData = {
   email: string
@@ -30,8 +30,8 @@ function Dashboard() {
 
   const load = async () => {
     try {
-      const supabase = getSupabase()
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+      const neon = getNeonClient()
+      const { data: sessionData, error: sessionError } = await neon.auth.getSession()
       if (sessionError) throw sessionError
       const user = sessionData.session?.user
       if (!user) {
@@ -40,20 +40,19 @@ function Dashboard() {
       }
       const since = new Date()
       since.setHours(0, 0, 0, 0)
-      const [profile, history, favorites, count, subscription] = await Promise.all([
-        supabase.from('profiles').select('display_name').eq('id', user.id).maybeSingle(),
-        supabase.from('processing_history').select('id,operation,input_count,output_count,output_bytes,created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10),
-        supabase.from('favorite_tools').select('id,tool_slug,created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(12),
-        supabase.from('processing_history').select('id', { count: 'exact', head: true }).eq('user_id', user.id).gte('created_at', since.toISOString()),
-        supabase.from('subscriptions').select('plan,status').eq('user_id', user.id).maybeSingle(),
+      const [history, favorites, count, subscription] = await Promise.all([
+        neon.from('processing_history').select('id,operation,input_count,output_count,output_bytes,created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10),
+        neon.from('favorite_tools').select('id,tool_slug,created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(12),
+        neon.from('processing_history').select('id', { count: 'exact', head: true }).eq('user_id', user.id).gte('created_at', since.toISOString()),
+        neon.from('subscriptions').select('plan,status').eq('user_id', user.id).maybeSingle(),
       ])
-      const failure = [profile.error, history.error, favorites.error, count.error, subscription.error].find(Boolean)
+      const failure = [history.error, favorites.error, count.error, subscription.error].find(Boolean)
       if (failure) throw failure
       setState({
         phase: 'ready',
         data: {
           email: user.email ?? '',
-          displayName: profile.data?.display_name || user.user_metadata?.name || '',
+          displayName: user.user_metadata?.displayName || user.user_metadata?.name || '',
           history: history.data ?? [],
           favorites: favorites.data ?? [],
           todayUsage: count.count ?? 0,
@@ -74,10 +73,10 @@ function Dashboard() {
     if (state.phase !== 'ready') return
     const item = state.data.favorites.find((favorite) => favorite.tool_slug === slug)
     try {
-      const supabase = getSupabase()
+      const neon = getNeonClient()
       const result = item
-        ? await supabase.from('favorite_tools').delete().eq('id', item.id)
-        : await supabase.from('favorite_tools').insert({ user_id: (await supabase.auth.getUser()).data.user?.id, tool_slug: slug })
+        ? await neon.from('favorite_tools').delete().eq('id', item.id)
+        : await neon.from('favorite_tools').insert({ tool_slug: slug })
       if (result.error) throw result.error
       setNotice(item ? 'Favorite removed.' : 'Tool added to favorites.')
       await load()
@@ -88,7 +87,7 @@ function Dashboard() {
 
   const signOut = async () => {
     try {
-      const { error } = await getSupabase().auth.signOut()
+      const { error } = await getNeonClient().auth.signOut()
       if (error) throw error
       await navigate({ to: '/login' })
     } catch (cause) {

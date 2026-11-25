@@ -59,6 +59,7 @@ export function CookieNotice() {
 
     try {
       localStorage.setItem(COOKIE_CONSENT_KEY, consent)
+      window.dispatchEvent(new Event('pdfpilot5u:consent-changed'))
       setVisible(false)
     } catch (cause) {
       setStorageError(tr('Your choice applies for this visit, but could not be saved.', 'آپ کی پسند اس وزٹ کے لیے لاگو ہے، لیکن محفوظ نہیں ہو سکی۔'))
@@ -88,7 +89,7 @@ export function CookieNotice() {
         <h2 className="font-display text-base font-bold">{tr('Your privacy matters', 'آپ کی رازداری اہم ہے')}</h2>
         <p className="mt-1 text-sm leading-relaxed text-muted">
           {tr(
-            'Essential storage supports preferences, saved files, and sign-in. Optional Firebase Analytics runs only when configured and if you choose Accept all. Ads are not active. Read our',
+            'Essential storage supports preferences, saved files, and sign-in. Optional analytics and advertising scripts run only after you choose Accept all. Read our',
             'ضروری اسٹوریج ترجیحات، محفوظ فائلوں اور سائن اِن کے لیے ہے۔ اختیاری Firebase Analytics صرف درست ترتیب کے بعد اور “سب قبول کریں” پر چلتا ہے۔ اشتہارات فعال نہیں۔ ہماری',
           )}{' '}
           <Link to="/legal/$page" params={{ page: 'cookies' }} className="font-semibold text-accent underline">

@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useI18n } from '#/lib/i18n'
-import { getSupabase } from '#/lib/supabase'
+import { getNeonAuth, getNeonClient } from '#/lib/neon'
 import { LogoMark } from './Logo'
 
 export type AuthMode = 'login' | 'signup' | 'forgot' | 'reset'
@@ -55,37 +55,39 @@ export function AuthForm({
     }
     setBusy(true)
     try {
-      const supabase = getSupabase()
       const origin = window.location.origin
       if (mode === 'signup') {
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-        if (sessionError) throw sessionError
-        const { error: authError } = sessionData.session?.user.is_anonymous
-          ? await supabase.auth.updateUser(
-              { email, password, data: { name: fullName.trim() } },
-              { emailRedirectTo: `${origin}/dashboard` },
-            )
-          : await supabase.auth.signUp({
-              email,
-              password,
-              options: {
-                data: { name: fullName.trim() },
-                emailRedirectTo: `${origin}/dashboard`,
-              },
-            })
+        const { error: authError } = await getNeonAuth().signUp.email({
+          email,
+          password,
+          name: fullName.trim(),
+          callbackURL: `${origin}/dashboard`,
+        })
         if (authError) throw authError
-        setMessage('Check your email for the verification link to finish creating your account.')
+        const { data: sessionData, error: sessionError } = await getNeonClient().auth.getSession()
+        if (sessionError) throw sessionError
+        if (sessionData.session) {
+          if (onSuccess) onSuccess()
+          else window.location.assign('/dashboard')
+          return
+        }
+        setMessage('Account created. If email verification is enabled, check your inbox to finish signing up.')
       } else if (mode === 'login') {
-        const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
+        const { error: authError } = await getNeonClient().auth.signInWithPassword({ email, password })
         if (authError) throw authError
         if (onSuccess) onSuccess()
         else window.location.assign('/dashboard')
       } else if (mode === 'forgot') {
-        const { error: authError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${origin}/reset-password` })
+        const { error: authError } = await getNeonAuth().requestPasswordReset({
+          email,
+          redirectTo: `${origin}/reset-password`,
+        })
         if (authError) throw authError
         setMessage('If an account exists for that email, a password reset link has been sent.')
       } else {
-        const { error: authError } = await supabase.auth.updateUser({ password })
+        const token = new URLSearchParams(window.location.search).get('token')
+        if (!token) throw new Error('This password reset link is invalid or expired. Request a new one.')
+        const { error: authError } = await getNeonAuth().resetPassword({ newPassword: password, token })
         if (authError) throw authError
         setMessage('Your password has been updated. You can now sign in.')
       }
@@ -100,25 +102,16 @@ export function AuthForm({
     setBusy(true)
     setError('')
     try {
-      const supabase = getSupabase()
-      const settingsResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/auth/v1/settings`, {
-        headers: { apikey: import.meta.env.VITE_SUPABASE_ANON_KEY },
-      })
-      if (!settingsResponse.ok)
-        throw new Error('Could not verify Google sign-in settings. Try signing in with email instead.')
-      const settings = await settingsResponse.json() as { external?: { google?: boolean } }
-      if (settings.external?.google === false)
-        throw new Error('Google sign-in is not enabled for this project. Use email, or enable Google under Supabase Authentication settings.')
-
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-      if (sessionError) throw sessionError
       const options = { redirectTo: `${window.location.origin}/dashboard` }
-      const { error: authError } = mode === 'signup' && sessionData.session?.user.is_anonymous
-        ? await supabase.auth.linkIdentity({ provider: 'google', options })
-        : await supabase.auth.signInWithOAuth({ provider: 'google', options })
+      const { error: authError } = await getNeonClient().auth.signInWithOAuth({ provider: 'google', options })
       if (authError) throw authError
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Google sign-in failed.')
+      const detail = cause instanceof Error ? cause.message : ''
+      setError(
+        detail.includes('403')
+          ? 'Google sign-in is not enabled for this production site yet. Please use email sign-in, or contact the site owner to enable Google OAuth for pdfpilot5u.vercel.app.'
+          : detail || 'Google sign-in failed. Please try email sign-in instead.',
+      )
       setBusy(false)
     }
   }

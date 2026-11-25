@@ -1,4 +1,3 @@
-import { createClient } from '@supabase/supabase-js'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { env } from 'node:process'
 
@@ -22,6 +21,37 @@ const MAX_DOCUMENT_CHARS = 60_000
 const MAX_CHAT_MESSAGES = 8
 const MAX_REQUESTS_PER_MINUTE = 12
 const rateLimits = new Map<string, { count: number; resetAt: number }>()
+let modelCache: { name: string; expiresAt: number } | null = null
+
+const MODEL_PREFERENCE = [
+  'gemini-3.6-flash',
+  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite',
+  'gemini-3.5-flash-lite',
+  'gemini-2.5-flash',
+]
+
+async function getAvailableModel(apiKey: string) {
+  if (modelCache && modelCache.expiresAt > Date.now()) return modelCache.name
+  const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models', {
+    headers: { 'x-goog-api-key': apiKey },
+    signal: AbortSignal.timeout(10_000),
+  })
+  if (!response.ok) throw new Error(`Gemini model discovery failed with ${response.status}`)
+  const result = await response.json() as {
+    models?: Array<{ name?: string; supportedGenerationMethods?: string[] }>
+  }
+  const available = new Set(
+    result.models
+      ?.filter((model) => model.supportedGenerationMethods?.includes('generateContent'))
+      .map((model) => model.name?.replace(/^models\//, ''))
+      .filter((name): name is string => Boolean(name)),
+  )
+  const selected = MODEL_PREFERENCE.find((name) => available.has(name))
+  if (!selected) throw new Error('No supported Gemini generateContent model is available for this API key.')
+  modelCache = { name: selected, expiresAt: Date.now() + 300_000 }
+  return selected
+}
 
 function reply(res: ApiResponse, status: number, body: { error: string } | { text: string }) {
   res.setHeader('Cache-Control', 'no-store')
@@ -63,11 +93,19 @@ function originAllowed(origin: string | undefined) {
   }
 }
 
-function rateLimited(userId: string) {
+function clientIp(req: ApiRequest) {
+  const realIp = req.headers['x-real-ip']
+  if (typeof realIp === 'string' && realIp.trim()) return realIp.trim()
+  const forwardedFor = req.headers['x-forwarded-for']
+  if (typeof forwardedFor === 'string' && forwardedFor.trim()) return forwardedFor.split(',')[0].trim()
+  return req.socket.remoteAddress ?? 'unknown'
+}
+
+function rateLimited(clientId: string) {
   const now = Date.now()
-  const current = rateLimits.get(userId)
+  const current = rateLimits.get(clientId)
   if (!current || current.resetAt <= now) {
-    rateLimits.set(userId, { count: 1, resetAt: now + 60_000 })
+    rateLimits.set(clientId, { count: 1, resetAt: now + 60_000 })
     if (rateLimits.size > 5_000) {
       for (const [id, limit] of rateLimits) {
         if (limit.resetAt <= now) rateLimits.delete(id)
@@ -132,31 +170,15 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (!task) return reply(res, 400, { error: 'The AI task settings are invalid or incomplete.' })
 
   const apiKey = env.GEMINI_API_KEY
-  const supabaseUrl = env.SUPABASE_URL || env.VITE_SUPABASE_URL
-  const supabaseAnonKey = env.SUPABASE_ANON_KEY || env.VITE_SUPABASE_ANON_KEY
-  if (!apiKey || !supabaseUrl || !supabaseAnonKey)
-    return reply(res, 503, { error: 'AI is not configured. Check the server-side Gemini key and Supabase project settings.' })
+  if (!apiKey)
+    return reply(res, 503, { error: 'AI is not configured. Check the server-side Gemini API key.' })
 
-  const authorization = req.headers.authorization
-  const bearer = typeof authorization === 'string' ? authorization.match(/^Bearer\s+(.+)$/i)?.[1] : undefined
-  if (!bearer) return reply(res, 401, { error: 'A secure guest session could not be established. Refresh the page and try again.' })
-
-  let userId: string
-  try {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    })
-    const { data, error } = await supabase.auth.getUser(bearer)
-    if (error || !data.user) return reply(res, 401, { error: 'Your session is invalid or expired. Sign in again.' })
-    userId = data.user.id
-  } catch {
-    return reply(res, 503, { error: 'Could not verify your account right now. Try again shortly.' })
-  }
-
-  if (rateLimited(userId)) return reply(res, 429, { error: 'You have reached the AI request limit. Wait a minute and try again.' })
+  if (rateLimited(clientIp(req)))
+    return reply(res, 429, { error: 'You have reached the AI request limit. Wait a minute and try again.' })
 
   try {
-    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent', {
+    const model = await getAvailableModel(apiKey)
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
       body: JSON.stringify({
@@ -171,6 +193,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       signal: AbortSignal.timeout(60_000),
     })
     if (!response.ok) {
+      if (response.status === 404) {
+        modelCache = null
+        return reply(res, 503, { error: 'The configured Gemini model is unavailable for this API key. Model discovery will refresh automatically; please try again.' })
+      }
       if (response.status === 429) return reply(res, 429, { error: 'Gemini is rate-limiting requests. Please wait and try again.' })
       if (response.status === 403 || response.status === 401)
         return reply(res, 503, { error: 'Gemini rejected the server key. Check that the key is current and the Gemini API is enabled.' })
@@ -182,7 +208,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const text = result.candidates?.[0]?.content?.parts?.map((part) => part.text ?? '').join('').trim()
     if (!text) return reply(res, 502, { error: 'Gemini returned no document answer. Try a more specific request.' })
     return reply(res, 200, { text })
-  } catch {
+  } catch (cause) {
+    if (cause instanceof Error && cause.message.includes('No supported Gemini'))
+      return reply(res, 503, { error: 'No Gemini text model available for this API key. Enable the Gemini API or create a key with an available Flash model.' })
     return reply(res, 502, { error: 'The AI request timed out or the provider could not be reached. Try again.' })
   }
 }

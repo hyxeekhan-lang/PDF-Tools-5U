@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
 import test from 'node:test'
 import { readFile } from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
 import { PDFDocument } from 'pdf-lib'
 import JSZip from 'jszip'
 import aiHandler from '../api/ai.ts'
@@ -42,6 +44,38 @@ async function fixture(name = 'input.pdf', pageCount = 2) {
   document.setAuthor('PDF Pilot 5U test')
   return new File([await document.save()], name, { type: 'application/pdf' })
 }
+
+function runNeonMigration(vercelEnv) {
+  return spawnSync(
+    process.execPath,
+    [fileURLToPath(new URL('../scripts/migrate-neon.mjs', import.meta.url))],
+    {
+      cwd: fileURLToPath(new URL('..', import.meta.url)),
+      env: {
+        ...process.env,
+        VERCEL_ENV: vercelEnv,
+        DATABASE_URL: '',
+        DATABASE_URL_UNPOOLED: '',
+      },
+      encoding: 'utf8',
+      timeout: 10_000,
+    },
+  )
+}
+
+test('Neon schema migration skips non-production builds without database credentials', () => {
+  const result = runNeonMigration('preview')
+  assert.equal(result.error, undefined)
+  assert.equal(result.status, 0, result.stderr)
+  assert.match(result.stdout, /Skipping Neon schema migration outside Vercel Production/)
+})
+
+test('Neon schema migration fails production builds without a database URL', () => {
+  const result = runNeonMigration('production')
+  assert.equal(result.error, undefined)
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /requires DATABASE_URL_UNPOOLED or DATABASE_URL/)
+})
 
 test('public tool catalog hides unavailable tools and redirects duplicate aliases', async () => {
   const slugs = TOOLS.map((tool) => tool.slug)
@@ -95,29 +129,20 @@ test('AI endpoint rejects unsupported methods, foreign origins, and incomplete r
   assert.match(inputResponse.body.error, /settings are invalid/i)
 })
 
-test('AI endpoint accepts a verified anonymous session and calls the available Gemini Flash model', async () => {
+test('AI endpoint accepts a guest request without login and calls the available Gemini Flash model', async () => {
   const savedEnv = {
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
-    SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
   }
   const originalFetch = globalThis.fetch
   let calledModel = ''
   process.env.GEMINI_API_KEY = 'test-gemini-key'
-  process.env.SUPABASE_URL = 'https://supabase.example'
-  process.env.SUPABASE_ANON_KEY = 'test-anon-key'
   globalThis.fetch = async (input) => {
     const url = new URL(String(input))
-    if (url.pathname === '/auth/v1/user') {
-      return new Response(JSON.stringify({
-        id: 'test-user',
-        aud: 'authenticated',
-        role: 'authenticated',
-        is_anonymous: true,
-        app_metadata: { provider: 'anonymous', providers: [] },
-        user_metadata: {},
-        created_at: '2026-01-01T00:00:00.000Z',
-      }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    if (url.pathname === '/v1beta/models') {
+      return new Response(JSON.stringify({ models: [{ name: 'models/gemini-3.5-flash-lite', supportedGenerationMethods: ['generateContent'] }] }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
     calledModel = url.pathname
     return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: 'A short summary.' }] } }] }), {
@@ -132,7 +157,7 @@ test('AI endpoint accepts a verified anonymous session and calls the available G
       method: 'POST',
       headers: {
         origin: 'https://pdfpilot5u.vercel.app',
-        authorization: 'Bearer test-access-token',
+        'x-real-ip': '203.0.113.17',
       },
       body: { action: 'summary', text: 'A document for summarization.' },
     }, response)
@@ -145,6 +170,35 @@ test('AI endpoint accepts a verified anonymous session and calls the available G
       if (value === undefined) delete process.env[name]
       else process.env[name] = value
     }
+  }
+})
+
+test('AI endpoint rate-limits guest requests by IP', async () => {
+  const savedKey = process.env.GEMINI_API_KEY
+  const originalFetch = globalThis.fetch
+  process.env.GEMINI_API_KEY = 'test-gemini-key'
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    candidates: [{ content: { parts: [{ text: 'A short answer.' }] } }],
+  }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+
+  try {
+    const request = {
+      method: 'POST',
+      headers: { origin: 'https://pdfpilot5u.vercel.app', 'x-real-ip': '203.0.113.18' },
+      body: { action: 'summary', text: 'A document for summarization.' },
+    }
+    for (let count = 0; count < 12; count++) {
+      const response = apiResponse()
+      await aiHandler(request, response)
+      assert.equal(response.statusCode, 200)
+    }
+    const limitedResponse = apiResponse()
+    await aiHandler(request, limitedResponse)
+    assert.equal(limitedResponse.statusCode, 429)
+  } finally {
+    globalThis.fetch = originalFetch
+    if (savedKey === undefined) delete process.env.GEMINI_API_KEY
+    else process.env.GEMINI_API_KEY = savedKey
   }
 })
 

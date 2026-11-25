@@ -18,7 +18,9 @@ export function PageShell({
           {intro && <p className="mt-5 text-lg leading-relaxed text-muted">{intro}</p>}
         </div>
       </section>
-      <div className="mx-auto max-w-3xl px-5 py-14 md:py-16">{children}</div>
+      <div className="mx-auto max-w-3xl px-5 py-14 md:py-16">
+        {children}
+      </div>
     </div>
   )
 }

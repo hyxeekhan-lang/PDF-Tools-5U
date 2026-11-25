@@ -26,10 +26,6 @@ function localAiApi(configuredEnv: Record<string, string | undefined>): Plugin {
     configureServer(server: ViteDevServer) {
       for (const name of [
         'GEMINI_API_KEY',
-        'SUPABASE_URL',
-        'SUPABASE_ANON_KEY',
-        'VITE_SUPABASE_URL',
-        'VITE_SUPABASE_ANON_KEY',
       ]) {
         if (!env[name] && configuredEnv[name]) env[name] = configuredEnv[name]
       }
@@ -93,8 +89,8 @@ const config = defineConfig(({ mode }) => {
   return {
     resolve: { tsconfigPaths: true },
     define: {
-      'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(configuredEnv.VITE_SUPABASE_URL || configuredEnv.SUPABASE_URL || ''),
-      'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(configuredEnv.VITE_SUPABASE_ANON_KEY || configuredEnv.SUPABASE_ANON_KEY || ''),
+      'import.meta.env.VITE_NEON_AUTH_URL': JSON.stringify(configuredEnv.VITE_NEON_AUTH_URL || configuredEnv.NEON_AUTH_BASE_URL || ''),
+      'import.meta.env.VITE_NEON_URL': JSON.stringify(configuredEnv.VITE_NEON_URL || ''),
       'import.meta.env.VITE_PUBLIC_SITE_URL': JSON.stringify(configuredEnv.VITE_PUBLIC_SITE_URL || configuredEnv.PUBLIC_SITE_URL || ''),
       'import.meta.env.VITE_FIREBASE_API_KEY': JSON.stringify(configuredEnv.VITE_FIREBASE_API_KEY || ''),
       'import.meta.env.VITE_FIREBASE_AUTH_DOMAIN': JSON.stringify(configuredEnv.VITE_FIREBASE_AUTH_DOMAIN || ''),

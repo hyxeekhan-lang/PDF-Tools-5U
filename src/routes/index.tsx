@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Check, Gift, Lock, MonitorSmartphone, ShieldCheck, UserX } from 'lucide-react'
+import { Check, FileCheck2, Gift, Lock, LockKeyhole, MonitorSmartphone, ScanText, ShieldCheck, UserX } from 'lucide-react'
 import { AllTools } from '#/components/AllTools'
+import { AdSenseUnit } from '#/components/AdSenseUnit'
 import { HeroUpload } from '#/components/HeroUpload'
 import { DownloadArt, HeroDecor, ProcessArt, Squiggle, StepArrow, UploadArt } from '#/components/Illustrations'
 import { ToolSearch } from '#/components/ToolSearch'
@@ -29,6 +30,9 @@ function Home() {
     <>
       <Hero />
       <ToolsSection />
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <AdSenseUnit slot={3} />
+      </div>
       <Why />
       <How />
       <Security />
@@ -77,6 +81,7 @@ function Hero() {
         <div className="animate-fade-up relative z-10" style={stagger(360)}>
           <ToolSearch className="mx-auto mt-8 max-w-xl" />
         </div>
+        <AdSenseUnit slot={1} />
         <div className="animate-fade-up mt-8" style={stagger(440)}>
           <p className="text-sm font-semibold text-muted">{t('popular.title')}</p>
           <div className="mt-3 flex flex-wrap justify-center gap-2">
@@ -89,9 +94,11 @@ function Hero() {
                   to="/tools/$slug"
                   params={{ slug }}
                   style={stagger(500 + i * 60)}
-                  className="animate-fade-up press group inline-flex min-h-10 items-center gap-2 rounded-full border border-line bg-card px-4 text-sm font-semibold hover:border-ink/15 hover:text-ink hover:shadow-[var(--shadow-soft)]"
+                  className="animate-fade-up press group inline-flex min-h-10 items-center gap-2 rounded-full border border-line bg-card px-4 text-sm font-semibold text-accent hover:border-accent/30 hover:text-accent-dark hover:shadow-[var(--shadow-soft)]"
                 >
-                  <Icon className="size-4 text-muted transition-transform duration-300 group-hover:-rotate-12 group-hover:scale-110" />
+                  <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-accent text-white transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105">
+                    <Icon className="size-4" />
+                  </span>
                   {pick(tool.name)}
                 </Link>
               )
@@ -108,6 +115,7 @@ function ToolsSection() {
   return (
     <section id="tools" className="scroll-mt-20 border-t border-line">
       <div className="mx-auto max-w-7xl px-5 py-20 md:py-24 lg:px-8">
+        <AdSenseUnit slot={2} />
         <div data-reveal className="max-w-2xl">
           <Eyebrow>{t('nav.tools')}</Eyebrow>
           <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-balance md:text-4xl">{t('all.title')}</h2>
@@ -224,6 +232,7 @@ function Security() {
 
 function CapabilityStrip() {
   const { t } = useI18n()
+  const icons = [FileCheck2, LockKeyhole, ScanText, ShieldCheck] as const
   return (
     <section aria-labelledby="capabilities-title" className="border-y border-line bg-card">
       <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8">
@@ -231,13 +240,19 @@ function CapabilityStrip() {
           {t('proof.title')}
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((n) => (
-            <article key={n} className="rounded-2xl border border-line px-5 py-6 text-center">
+          {[1, 2, 3, 4].map((n, i) => {
+            const Icon = icons[i]
+            return (
+            <article key={n} className="group rounded-2xl border border-line bg-paper px-5 py-6 text-center transition duration-300 hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-[var(--shadow-soft)]">
+              <span className="mx-auto grid size-11 place-items-center rounded-xl bg-accent text-white shadow-sm transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105">
+                <Icon className="size-5" aria-hidden="true" />
+              </span>
               <p className="font-display text-2xl font-extrabold">{t(`proof.${n}.title` as TKey)}</p>
               <p className="mt-2 text-sm font-semibold text-muted">{t(`proof.${n}.label` as TKey)}</p>
               <p className="mt-3 text-sm leading-relaxed text-muted">{t(`proof.${n}.description` as TKey)}</p>
             </article>
-          ))}
+            )
+          })}
         </div>
       </div>
     </section>

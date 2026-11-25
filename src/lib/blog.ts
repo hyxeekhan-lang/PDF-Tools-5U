@@ -51,7 +51,7 @@ export const POSTS: Post[] = [
         heading: 'Know which features need a network',
         paragraphs: [
           'Some browser tools can work after their scripts and models have loaded, while other features call a separate service. Optical character recognition may download a language model the first time it is used. A translation or document-question feature may send extracted text to an AI provider after the user signs in and gives explicit permission. These are separate data flows and should be described beside the feature, not hidden behind the general description of local PDF processing.',
-          'PDF Pilot 5U’s optional AI workflow uses selectable text extracted in the browser and sends that text to Google Gemini only after the user gives consent. A registered account is not required; an anonymous Supabase session may be created to verify and rate-limit the request. The source PDF is not sent by that workflow, but the selected text is. Scanned pages need OCR before they have selectable text. Users should review the provider’s terms and avoid sending information they are not authorized to disclose.',
+          'PDF Pilot 5U’s optional AI workflow uses selectable text extracted in the browser and sends that text to Google Gemini only after the user gives consent. A registered account is not required; requests are rate-limited by IP. The source PDF is not sent by that workflow, but the selected text is. Scanned pages need OCR before they have selectable text. Users should review the provider’s terms and avoid sending information they are not authorized to disclose.',
         ],
       },
       {
@@ -171,7 +171,7 @@ export const POSTS: Post[] = [
       {
         heading: 'Privacy and handling the output',
         paragraphs: [
-          'PDF Pilot 5U’s merge operation processes the selected PDF bytes in the browser; it does not upload the source documents to an application server. The website still needs to load its code, and ordinary hosting requests can include technical information such as the requested page. If you use an account feature, account information is handled by Supabase. Read the privacy policy for the current details and do not infer that every part of a website is offline.',
+          'PDF Pilot 5U’s merge operation processes the selected PDF bytes in the browser; it does not upload the source documents to an application server. The website still needs to load its code, and ordinary hosting requests can include technical information such as the requested page. If you use an account feature, account information is handled by Neon Auth. Read the privacy policy for the current details and do not infer that every part of a website is offline.',
           'Generated results may be listed in My Files using browser storage until you delete them or clear site data. On a shared computer, download only to a location you control, remove the browser-stored result, and sign out. Before sending the merged file, review every page for private material that should not be included. Combining documents can unintentionally bring together data that was previously kept in separate files.',
         ],
       },
@@ -538,7 +538,7 @@ export const POSTS: Post[] = [
       {
         heading: 'Privacy and file handling',
         paragraphs: [
-          'PDF Pilot 5U’s basic conversion processes the selected file in the browser. The site still downloads application code, and account features can involve Supabase. The resulting DOCX is downloaded to the browser and may be saved in local My Files history when that feature is used. Local storage can persist after the tab closes, so delete results that are no longer needed.',
+          'PDF Pilot 5U’s basic conversion processes the selected file in the browser. The site still downloads application code, and account features can involve Neon Auth. The resulting DOCX is downloaded to the browser and may be saved in local My Files history when that feature is used. Local storage can persist after the tab closes, so delete results that are no longer needed.',
           'On a shared device, save the output only in a location you control, remove local browser history entries, and sign out. Do not convert a document if your organization prohibits the use of an unapproved web application. AI features are separate from this conversion; PDF-to-Word does not require sending text to an AI provider. Read the site privacy policy for current details about account services and any optional feature.',
         ],
       },

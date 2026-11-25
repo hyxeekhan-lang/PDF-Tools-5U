@@ -2,6 +2,7 @@ import { Link, createFileRoute, notFound, redirect } from '@tanstack/react-route
 import { Clock, Info, ShieldCheck } from 'lucide-react'
 import { ToolCard, ToolIcon } from '#/components/ToolCard'
 import { ToolWorkspace } from '#/components/tool/ToolWorkspace'
+import { ToolSeoDetails, ToolSeoIntro, ToolStepPreview } from '#/components/tool/ToolSeoContent'
 import { useI18n } from '#/lib/i18n'
 import { LISTED_TOOLS, TOOL_REDIRECTS, getTool } from '#/lib/tools'
 
@@ -104,12 +105,17 @@ function ToolPage() {
         ) : (
           <>
             <ToolWorkspace key={tool.slug} tool={tool} />
+            <ToolSeoIntro tool={tool} />
+            <ToolStepPreview tool={tool} />
             <section className="mt-12 border-t border-line pt-8" aria-labelledby="tool-guide-heading">
-              <h2 id="tool-guide-heading" className="font-display text-2xl font-bold">
-                How to use {pick(tool.name)}
-              </h2>
-              <p className="mt-3 leading-relaxed text-muted">{pick(tool.desc)}</p>
-              <ol className="mt-5 list-inside list-decimal space-y-2 leading-relaxed text-muted">
+              <div className="max-w-3xl">
+                <p className="text-sm font-semibold tracking-wide text-accent uppercase">Simple workflow</p>
+                <h2 id="tool-guide-heading" className="mt-2 font-display text-2xl font-bold">
+                  How to use {pick(tool.name)}
+                </h2>
+                <p className="mt-3 leading-relaxed text-muted">Follow these steps to get a reliable result from {pick(tool.name)}.</p>
+              </div>
+              <ol className="mt-5 max-w-3xl list-inside list-decimal space-y-2 leading-relaxed text-muted">
                 <li>
                   Choose {tool.multiple ? 'one or more' : 'a'} {tool.accepts === 'pdf' ? 'PDF' : tool.accepts.toUpperCase()} file{tool.multiple ? 's' : ''} from your device.
                 </li>
@@ -129,6 +135,7 @@ function ToolPage() {
                     )}
               </p>
             </section>
+            <ToolSeoDetails tool={tool} />
           </>
         )}
 

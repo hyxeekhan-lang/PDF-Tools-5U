@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { PageShell, Prose } from '#/components/PageShell'
 import { useI18n } from '#/lib/i18n'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/contact')({
   staticData: { pageId: 'pg_cT4nWz8pQe1V', funnel: { next: [] } },
@@ -18,14 +19,39 @@ export const Route = createFileRoute('/contact')({
 
 function Contact() {
   const { t } = useI18n()
+  const [sent, setSent] = useState(false)
+  const [error, setError] = useState('')
+  const submit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setError('')
+    const data = new FormData(event.currentTarget)
+    if (!String(data.get('email') ?? '').trim() || !String(data.get('message') ?? '').trim()) {
+      setError('Please enter your email address and message.')
+      return
+    }
+    const subject = `[PDF Pilot 5U] ${data.get('topic') || 'Website enquiry'}`
+    const body = `Name: ${data.get('name')}\nEmail: ${data.get('email')}\n\n${data.get('message')}`
+    window.location.href = `mailto:hyxeekhan@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    setSent(true)
+  }
   return (
     <PageShell eyebrow={t('footer.contact')} title="Get in touch" intro="Questions, bug reports and tool requests are welcome.">
       <Prose>
+        <form onSubmit={submit} className="not-prose space-y-5 rounded-2xl border border-line bg-card p-5 sm:p-7">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <label className="grid gap-2 text-sm font-semibold">Name<input required name="name" autoComplete="name" maxLength={100} className="min-h-12 rounded-xl border border-line bg-paper px-4 font-normal outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" /></label>
+            <label className="grid gap-2 text-sm font-semibold">Email<input required type="email" name="email" autoComplete="email" maxLength={254} className="min-h-12 rounded-xl border border-line bg-paper px-4 font-normal outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" /></label>
+          </div>
+          <label className="grid gap-2 text-sm font-semibold">Topic<select name="topic" className="min-h-12 rounded-xl border border-line bg-paper px-4 font-normal outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"><option>Bug report</option><option>Tool request</option><option>Privacy question</option><option>General question</option></select></label>
+          <label className="grid gap-2 text-sm font-semibold">Message<textarea required name="message" rows={6} maxLength={5000} className="rounded-xl border border-line bg-paper px-4 py-3 font-normal outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" /></label>
+          <p className="text-sm text-muted">Please do not include sensitive personal information or attach a confidential PDF.</p>
+          <button type="submit" className="min-h-12 rounded-full bg-accent px-6 font-semibold text-white transition hover:bg-accent-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">Open email draft</button>
+          {error && <p role="alert" className="text-sm font-semibold text-accent-dark">{error}</p>}
+          {sent && <p role="status" className="text-sm font-semibold text-accent-dark">Your email draft should now be open. If it did not open, email hyxeekhan@gmail.com directly.</p>}
+        </form>
         <p>
-          Email:{' '}
-          <a href="mailto:hyxeekhan@gmail.com" className="font-semibold text-accent">
-            hyxeekhan@gmail.com
-          </a>
+          Prefer email? Contact{' '}
+          <a href="mailto:hyxeekhan@gmail.com" className="font-semibold text-accent">hyxeekhan@gmail.com</a>.
         </p>
         <p>
           Please don’t attach the PDF you had trouble with unless you’re comfortable sharing it. Describing the problem

@@ -403,7 +403,7 @@ export function BatchOptions({ files, run }: OptionsProps) {
           outputs.push({ ...result[0], name: `${baseName(files[current].name)}-${operation}.pdf` })
         }
         return outputs
-      }, { zipAs: 'pdfora-batch-results.zip' })} label={tr(`Process ${files.length} PDFs`, `${files.length} PDFs پروسیس کریں`)} />
+      }, { zipAs: 'pdfpilot5u-batch-results.zip' })} label={tr(`Process ${files.length} PDFs`, `${files.length} PDFs پروسیس کریں`)} />
     </Panel>
   )
 }

@@ -4,17 +4,18 @@ import { Header } from '#/components/Header'
 import { CookieNotice } from '#/components/CookieNotice'
 import { I18nProvider, bootScript } from '#/lib/i18n'
 import { usePageTransition, useScrollReveal } from '#/lib/motion'
+import '#/lib/sentry'
 
 import appCss from '../styles.css?url'
 
 const installPromptScript = `window.addEventListener('beforeinstallprompt', function (event) {
   event.preventDefault();
-  window.__pdforaInstallPrompt = event;
-  window.dispatchEvent(new Event('pdfora-install-prompt'));
+  window.__pdfpilot5uInstallPrompt = event;
+  window.dispatchEvent(new Event('pdfpilot5u-install-prompt'));
 });
 window.addEventListener('appinstalled', function () {
-  window.__pdforaInstallPrompt = null;
-  window.dispatchEvent(new Event('pdfora-install-prompt'));
+  window.__pdfpilot5uInstallPrompt = null;
+  window.dispatchEvent(new Event('pdfpilot5u-install-prompt'));
 });
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(function (error) {

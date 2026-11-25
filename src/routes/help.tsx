@@ -43,7 +43,7 @@ const TOPICS = [
   },
   {
     q: 'Does PDF Pilot 5U upload my documents?',
-    a: 'Local PDF tools process files in your browser. If you choose an AI tool, selectable text is sent to Google Gemini only after you explicitly consent; the source PDF is not uploaded. A guest Supabase session may be created automatically, but a registered account is not required. Avoid sending confidential material to AI services.',
+    a: 'Local PDF tools process files in your browser. If you choose an AI tool, selectable text is sent to Google Gemini only after you explicitly consent; the source PDF is not uploaded. AI works without an account; requests are rate-limited by IP. Avoid sending confidential material to AI services.',
   },
   {
     q: 'Why can’t I find PDF/A or a certificate-backed signature?',
