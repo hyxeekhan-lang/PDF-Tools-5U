@@ -1,4 +1,4 @@
-import { PDFDocument, PDFName, StandardFonts, degrees, rgb } from 'pdf-lib'
+import { PDFArray, PDFDocument, PDFName, PDFString, StandardFonts, degrees, rgb } from 'pdf-lib'
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
 
 export const MAX_BYTES = 100 * 1024 * 1024
@@ -1033,6 +1033,27 @@ export async function addTextToPdf(file: File, text: string, size: number, onPro
     onProgress((index + 1) / pages.length)
   })
   return [{ name: `${baseName(file.name)}-edited.pdf`, blob: toBlob(await doc.save()) }]
+}
+
+export async function addLinkPreviewToPdf(file: File, url: string, onProgress: Progress) {
+  const value = url.trim()
+  if (!/^https?:\/\/[^\s]+$/i.test(value)) throw err('Enter a valid http or https URL.', 'درست http یا https URL درج کریں۔')
+  const doc = await loadPdf(file)
+  const font = await doc.embedFont(StandardFonts.Helvetica)
+  const pages = doc.getPages()
+  pages.forEach((page, index) => {
+    const width = Math.min(260, page.getWidth() - 72)
+    const height = 48
+    const x = 36
+    const y = 36
+    page.drawRectangle({ x, y, width, height, color: rgb(0.96, 0.97, 1), borderColor: rgb(0.85, 0.88, 0.94), borderWidth: 1 })
+    page.drawText('OPEN LINK', { x: x + 12, y: y + 28, size: 8, font, color: rgb(0.85, 0.12, 0.08) })
+    page.drawText(value, { x: x + 12, y: y + 12, size: 9, font, color: rgb(0.08, 0.12, 0.2), maxWidth: width - 24 })
+    const annotation = doc.context.obj({ Type: 'Annot', Subtype: 'Link', Rect: [x, y, x + width, y + height], Border: [0, 0, 0], A: { Type: 'Action', S: 'URI', URI: PDFString.of(value) } })
+    page.node.set(PDFName.of('Annots'), PDFArray.withContext(doc.context, [annotation]))
+    onProgress((index + 1) / pages.length)
+  })
+  return [{ name: `${baseName(file.name)}-link-preview.pdf`, blob: toBlob(await doc.save()) }]
 }
 
 export async function highlightTextPdf(file: File, phrase: string, onProgress: Progress) {

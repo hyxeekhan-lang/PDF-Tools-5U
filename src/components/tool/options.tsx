@@ -14,6 +14,7 @@ import {
   addHeaderFooter,
   addImageToPdf,
   addTextToPdf,
+  addLinkPreviewToPdf,
   addWatermark,
   compressPdf,
   comparePdfText,
@@ -535,6 +536,26 @@ export function AddTextOptions({ files, run }: OptionsProps) {
       </Field>
       <p className="text-sm text-muted">{tr('Text is placed at the bottom-left of every page. This is a basic stamping tool, not a full text editor.', 'متن ہر صفحے کے نیچے بائیں جانب لگے گا۔ یہ بنیادی ٹول ہے، مکمل PDF editor نہیں۔')}</p>
       <ProcessButton disabled={!text.trim()} onClick={() => run((p) => addTextToPdf(files[0], text, size, p))} label={tr('Add text', 'متن شامل کریں')} />
+    </Panel>
+  )
+}
+
+export function AddLinkPreviewOptions({ files, run }: OptionsProps) {
+  const { tr } = useI18n()
+  const [url, setUrl] = useState('https://')
+  let host = 'Your link preview'
+  try { host = new URL(url).hostname || host } catch { /* live preview remains a safe placeholder */ }
+  return (
+    <Panel>
+      <Field label={tr('Website URL', 'ویب سائٹ URL')}>
+        <input className={inputClass} type="url" value={url} onChange={(event) => setUrl(event.target.value)} placeholder="https://example.com" maxLength={500} />
+      </Field>
+      <div className="flex items-center gap-3 rounded-2xl border border-line bg-blush p-4">
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent text-white" aria-hidden="true">↗</span>
+        <div className="min-w-0"><p className="font-semibold">{host}</p><p className="truncate text-sm text-muted">{url === 'https://' ? 'Paste a URL to preview it here' : url}</p></div>
+      </div>
+      <p className="text-sm text-muted">A clickable link card is added to the bottom-left of every PDF page. The website preview is generated privately from the URL; no page content is fetched.</p>
+      <ProcessButton disabled={!/^https?:\/\/[^\s]+$/i.test(url.trim())} onClick={() => run((p) => addLinkPreviewToPdf(files[0], url, p))} label={tr('Add link preview', 'لنک پری ویو شامل کریں')} />
     </Panel>
   )
 }

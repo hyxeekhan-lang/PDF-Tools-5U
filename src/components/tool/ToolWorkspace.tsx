@@ -11,6 +11,7 @@ import { GeminiOptions } from './GeminiOptions'
 import {
   CompressOptions,
   AddTextOptions,
+  AddLinkPreviewOptions,
   AddImageOptions,
   BatchOptions,
   CompareOptions,
@@ -103,6 +104,7 @@ const OPTIONS: Record<string, (p: OptionsProps) => React.ReactNode> = {
   'compress-pdf': CompressOptions,
   'remove-metadata': RemoveMetadataOptions,
   'add-text': AddTextOptions,
+  'add-link-preview': AddLinkPreviewOptions,
   'header-footer': HeaderFooterOptions,
   'crop-pdf': CropOptions,
   'pdf-compare': CompareOptions,
