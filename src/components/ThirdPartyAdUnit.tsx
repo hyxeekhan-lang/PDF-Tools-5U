@@ -46,7 +46,6 @@ export function ThirdPartyAdUnit({ slot, label = 'Advertisements' }: { slot: 1 |
   return <aside className="my-10 flex min-h-24 items-center justify-center overflow-hidden text-center" aria-label={label}>
     <div><span className="mb-2 block text-xs uppercase tracking-wider text-muted">{label}</span><div ref={ref} style={{ minHeight: unit.height, maxWidth: '100%', overflow: 'hidden' }}><iframe
       title={`${label} ${unit.width} by ${unit.height}`}
-      sandbox="allow-scripts allow-forms"
       loading="lazy"
       srcDoc={`<!doctype html><html><body style="margin:0;display:flex;justify-content:center;overflow:hidden"><script>window.atOptions={key:'${unit.key}',format:'iframe',height:${unit.height},width:${unit.width},params:{}};<\/script><script async data-cfasync="false" src="https://${providerHost}/22/${unit.key}"><\/script></body></html>`}
       style={{ display: 'block', width: '100%', maxWidth: unit.width, height: unit.height, border: 0, margin: '0 auto' }}
