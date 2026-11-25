@@ -7,7 +7,7 @@ declare global {
 const CONSENT_KEY = 'pdfpilot5u-cookie-consent-v3'
 const publisherId = import.meta.env.VITE_ADSENSE_PUBLISHER_ID?.trim() ?? ''
 const slots = { 1: import.meta.env.VITE_ADSENSE_SLOT_ID_1?.trim() ?? '', 2: import.meta.env.VITE_ADSENSE_SLOT_ID_2?.trim() ?? '', 3: import.meta.env.VITE_ADSENSE_SLOT_ID_3?.trim() ?? '' } as const
-const configured = /^pub-\d{16}$/.test(publisherId) && Object.values(slots).every((slot) => /^\d+$/.test(slot))
+const configured = /^pub-\d{16}$/.test(publisherId)
 
 export function AdSenseUnit({ slot }: { slot: 1 | 2 | 3 }) {
   const [allowed, setAllowed] = useState(false)
