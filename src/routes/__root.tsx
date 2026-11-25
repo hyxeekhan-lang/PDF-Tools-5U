@@ -27,7 +27,7 @@ const FONTS =
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Dancing+Script:wght@600&family=Great+Vibes&family=Caveat:wght@600&display=swap'
 
 const SITE_URL = import.meta.env.VITE_PUBLIC_SITE_URL || 'https://pdfpilot5u.vercel.app'
-const SOCIAL_IMAGE = `${SITE_URL}/brand/pwa-icon-512.png`
+const SOCIAL_IMAGE = `${SITE_URL}/brand/social-preview.png`
 
 export const Route = createRootRoute({
   head: () => ({
@@ -46,8 +46,8 @@ export const Route = createRootRoute({
       { property: 'og:image', content: SOCIAL_IMAGE },
       { property: 'og:image:alt', content: 'PDF Pilot 5U PDF tools' },
       { property: 'og:image:type', content: 'image/png' },
-      { property: 'og:image:width', content: '512' },
-      { property: 'og:image:height', content: '512' },
+      { property: 'og:image:width', content: '1200' },
+      { property: 'og:image:height', content: '630' },
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: 'PDF Pilot 5U — Free browser-based PDF tools' },
       { name: 'twitter:description', content: 'Work with PDF files in your browser using PDF Pilot 5U.' },
