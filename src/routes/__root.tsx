@@ -3,6 +3,7 @@ import { Footer } from '#/components/Footer'
 import { Header } from '#/components/Header'
 import { CookieNotice } from '#/components/CookieNotice'
 import { InstallAppBanner } from '#/components/InstallAppButton'
+import { BottomNavbar } from '#/components/BottomNavbar'
 import { I18nProvider, bootScript } from '#/lib/i18n'
 import { usePageTransition, useScrollReveal } from '#/lib/motion'
 import '#/lib/sentry'
@@ -111,12 +112,13 @@ function RootLayout() {
           Skip to main content
         </a>
         <Header />
-        <main id="main-content" ref={mainRef} className="flex-1">
+        <main id="main-content" ref={mainRef} className="flex-1 pb-20 xl:pb-0">
           <Outlet />
         </main>
         <Footer />
         <CookieNotice />
         <InstallAppBanner />
+        <BottomNavbar />
       </div>
     </I18nProvider>
   )
