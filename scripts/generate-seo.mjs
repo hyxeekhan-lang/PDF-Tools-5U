@@ -49,7 +49,7 @@ const urls = [...new Set(pages)].map((path) => `  <url><loc>${baseUrl}${path}</l
 await writeFile('public/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`, 'utf8')
 await writeFile('public/robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${baseUrl}/sitemap.xml\n`, 'utf8')
 
-const publisherId = process.env.ADSENSE_PUBLISHER_ID?.trim()
+const publisherId = (process.env.ADSENSE_PUBLISHER_ID ?? process.env.VITE_ADSENSE_PUBLISHER_ID)?.trim()
 if (publisherId) {
   if (!/^pub-\d{16}$/.test(publisherId)) throw new Error('ADSENSE_PUBLISHER_ID must use the format pub- followed by 16 digits.')
   await writeFile('public/ads.txt', `google.com, ${publisherId}, DIRECT, f08c47fec0942fa0\n`, 'utf8')
