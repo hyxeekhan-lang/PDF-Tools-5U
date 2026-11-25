@@ -26,9 +26,9 @@ function hasConfiguration() {
 async function initializeAnalytics() {
   if (!hasConfiguration()) return null
 
-  if (!isConfigured()) {
-    throw new Error('Firebase Analytics is not configured. Set the VITE_FIREBASE_* variables.')
-  }
+  // Analytics is optional. A partially configured Firebase environment must
+  // not make the privacy banner fail or block the user's consent choice.
+  if (!isConfigured()) return null
 
   const [appApi, analytics] = await Promise.all([import('firebase/app'), import('firebase/analytics')])
   analyticsApi = analytics

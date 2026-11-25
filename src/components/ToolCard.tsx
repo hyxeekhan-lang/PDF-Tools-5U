@@ -47,6 +47,9 @@ export function ToolCard({ tool }: { tool: Tool }) {
           {soon && <span className="ms-2 text-xs font-semibold text-muted sm:hidden">· {t('tool.soon')}</span>}
         </h3>
         <p className="mt-1 text-sm leading-relaxed text-muted sm:mt-1.5">{pick(tool.desc)}</p>
+        <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent transition group-hover:gap-2 group-hover:text-accent-dark">
+          Open tool <span aria-hidden="true">→</span>
+        </span>
       </div>
     </Link>
   )

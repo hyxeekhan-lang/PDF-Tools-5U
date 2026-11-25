@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { LoaderCircle, X } from 'lucide-react'
 import { useI18n } from '#/lib/i18n'
 import { baseName, downloadBlob, pdfToText } from '#/lib/pdf'
-import { getSupabase } from '#/lib/supabase'
+import { getNeonClient, isNeonConfigured } from '#/lib/neon'
 import { AuthForm } from '#/components/AuthForm'
 
 type AiAction = 'summary' | 'question' | 'translate' | 'key-points' | 'report' | 'chat'
@@ -86,29 +86,16 @@ export function GeminiOptions({ files, toolSlug }: { files: File[]; toolSlug: st
       }
       setExtractionProgress(null)
 
-      setStatus(tr('Preparing secure guest access…', 'محفوظ مہمان رسائی تیار کی جا رہی ہے…'))
-      const supabase = getSupabase()
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-      if (sessionError) throw sessionError
-      let session = sessionData.session
-      let guestSession = session?.user.is_anonymous ?? false
-      if (!session) {
-        const { data: guestData, error: guestError } = await supabase.auth.signInAnonymously()
-        if (guestError) {
-          console.error('Could not create a guest AI session.', guestError)
-          if (guestError.code === 'anonymous_provider_disabled') {
-            throw new Error(tr(
-              'Guest AI is disabled in this Supabase project. Enable Anonymous Sign-Ins in Supabase Authentication settings, or sign in with an account.',
-              'اس Supabase پروجیکٹ میں مہمان AI بند ہے۔ Supabase Authentication settings میں Anonymous Sign-Ins فعال کریں یا اپنے اکاؤنٹ سے سائن اِن کریں۔',
-            ))
-          }
-          throw new Error(tr('Guest AI access is unavailable right now. Please try again later.', 'مہمان AI رسائی فی الحال دستیاب نہیں۔ براہِ کرم بعد میں دوبارہ کوشش کریں۔'))
+      let signedIn = false
+      if (isNeonConfigured()) {
+        try {
+          const { data: sessionData, error: sessionError } = await getNeonClient().auth.getSession()
+          if (sessionError) console.error('Could not check the optional Neon session for the AI sign-in prompt.', sessionError)
+          else signedIn = Boolean(sessionData.session)
+        } catch (cause) {
+          console.error('Could not check the optional Neon session for the AI sign-in prompt.', cause)
         }
-        session = guestData.session
-        if (!session) throw new Error(tr('Guest AI access could not be started. Please try again.', 'مہمان AI رسائی شروع نہیں ہو سکی۔ براہِ کرم دوبارہ کوشش کریں۔'))
-        guestSession = true
       }
-      const accessToken = session.access_token
 
       setStatus(tr('Sending the text you approved to Gemini…', 'آپ کی اجازت سے متن Gemini کو بھیجا جا رہا ہے…'))
       const outgoingMessages = isChat
@@ -116,7 +103,7 @@ export function GeminiOptions({ files, toolSlug }: { files: File[]; toolSlug: st
         : undefined
       const request = fetch('/api/ai', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action,
           text: documentText,
@@ -146,7 +133,7 @@ export function GeminiOptions({ files, toolSlug }: { files: File[]; toolSlug: st
       } else {
         setAnswer(result.text)
       }
-      setShowAccountPrompt(guestSession)
+      setShowAccountPrompt(!signedIn)
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'The AI request failed. Try again.')
     } finally {

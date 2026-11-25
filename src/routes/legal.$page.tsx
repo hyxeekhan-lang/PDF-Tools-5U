@@ -21,12 +21,11 @@ const PAGES: Record<string, LegalPage> = {
         </p>
         <h2>Accounts and processing history</h2>
         <p>
-          If you create an account or sign in, Supabase processes your email address and account information. When a
+          If you create an account or sign in, Neon Auth processes your email address and account information. When a
           signed-in user completes a local tool, PDF Pilot 5U may store the tool name, input and output counts, output size
           and timestamp as processing history. PDF contents are not included in that history. Authentication sessions
-          are stored by the Supabase client in this browser. AI requests made without a registered account may create an
-          anonymous Supabase session automatically so the request can be verified and rate-limited; this does not require
-          an email address or password.
+          are managed by Neon Auth. AI requests do not create an account or anonymous session; the AI endpoint uses a
+          per-IP rate limit. Standard hosting and security logs may also contain request IP information.
         </p>
         <h2>AI document tools</h2>
         <p>
@@ -51,9 +50,10 @@ const PAGES: Record<string, LegalPage> = {
         </p>
         <h2>Advertising</h2>
         <p>
-          PDF Pilot 5U does not currently display Google AdSense ads or load advertising trackers. If advertising is added,
-          this policy and applicable consent choices will be updated before activation. In regions where Google
-          requires a certified consent management platform, we will configure one before serving ads.
+          PDF Pilot 5U may display clearly labelled third-party advertisements in the three reserved ad placements.
+          Advertising scripts are loaded only after you choose “Accept all” in the cookie notice. The current placements
+          are not Google AdSense units; Google AdSense will be enabled only after an approved publisher account and
+          valid ad-slot IDs are configured. Availability and processing may also depend on the advertising provider.
         </p>
         <h2>Analytics</h2>
         <p>
@@ -84,8 +84,8 @@ const PAGES: Record<string, LegalPage> = {
         <p>
           Local PDF tools are provided without charge, as is. You may use them for documents you have the right to
           access and modify. Account features require an account. Optional AI tools do not require a registered account,
-          but they do require separate consent before selected document text is sent to Google Gemini. A guest Supabase
-          session may be created automatically to verify and rate-limit the request.
+          but they do require separate consent before selected document text is sent to Google Gemini. An account is not
+          required; the AI endpoint applies a per-IP request limit.
         </p>
         <h2>Your responsibility</h2>
         <p>
@@ -104,8 +104,8 @@ const PAGES: Record<string, LegalPage> = {
         <h2>Third-party AI tools</h2>
         <p>
           AI document features are optional and require your explicit consent before extracted text is sent to Google
-          Gemini. A registered account is not required; an anonymous Supabase session may be created automatically to
-          verify and rate-limit the request. Review the result for accuracy and do not submit information you are not
+          Gemini. A registered account is not required; the AI endpoint applies a per-IP request limit. Review the result
+          for accuracy and do not submit information you are not
           permitted to share with that provider.
         </p>
         <h2>Contact</h2>
@@ -115,15 +115,15 @@ const PAGES: Record<string, LegalPage> = {
       </>
     ),
   },
-  refund: {
-    title: 'Refund Policy',
-    description: 'PDF Pilot 5U is free, so there are no payments to refund.',
+  removedPolicy: {
+    title: 'Retired legal page',
+    description: 'This retired legal page is no longer published.',
     body: (
       <>
         <p>{UPDATED}</p>
         <p>
           PDF Pilot 5U is free to use. We don’t sell plans, subscriptions or credits, and we never ask for payment details.
-          Because no payments are taken, there is nothing to refund.
+          This retired page is no longer published.
         </p>
         <p>If anyone asks you to pay for PDF Pilot 5U, it isn’t us.</p>
       </>
@@ -136,13 +136,13 @@ const PAGES: Record<string, LegalPage> = {
       <>
         <p>{UPDATED}</p>
         <p>
-          PDF Pilot 5U does not load advertising tags. Firebase Analytics is optional and only loads when valid
-          configuration is installed and you choose “Accept all”; it does not load when you choose “Accept only
-          essential” or close the notice. The app uses browser storage and essential authentication state as follows:
+          PDF Pilot 5U loads optional analytics and advertising tags only after you choose “Accept all”; neither loads
+          when you choose “Accept only essential” or close the notice. The app uses browser storage and essential
+          authentication state as follows:
         </p>
         <ul>
           <li>
-            <strong>pdfora-cookie-consent-v2</strong> (local storage): records whether you chose all optional analytics
+            <strong>pdfpilot5u-cookie-consent-v2</strong> (local storage): records whether you chose all optional analytics
             or essential storage only.
           </li>
           <li>
@@ -155,21 +155,21 @@ const PAGES: Record<string, LegalPage> = {
             <strong>pdftools</strong> (IndexedDB): results listed in My Files.
           </li>
           <li>
-            Supabase authentication session (browser local storage): used only when you sign in.
+            Neon Auth session state: maintains account access when you sign in; storage is managed by Neon Auth.
           </li>
         </ul>
         <p>
-          Hosting and security infrastructure may use essential request technology. No non-essential advertising
-          cookies are active at this time.
+          Hosting and security infrastructure may use essential request technology. Advertising providers may set or
+          access their own identifiers after optional advertising is allowed; their policies also apply.
         </p>
         <h2 id="privacy-settings">Privacy settings</h2>
         <p>
-          Your choice controls Firebase Analytics and can be changed at any time using this control. Analytics may
-          store identifiers or cookies only after you accept all. No advertising cookies are active. You can delete
+          Your choice controls Firebase Analytics and optional advertising scripts and can be changed at any time using
+          this control. These services may store identifiers or cookies only after you accept all. You can delete
           saved PDF results on the{' '}
           <a href="/my-files">My Files page</a> and clear local preferences or your signed-in session through your
-          browser settings. This notice is not a certified consent management platform; one will be configured where
-          legally required before serving ads.
+          browser settings. This notice is a basic site preference control, not a certified consent management platform.
+          A certified CMP may be required for some advertising regions and remains an external compliance setup item.
         </p>
         <button
           type="button"
@@ -186,6 +186,7 @@ const PAGES: Record<string, LegalPage> = {
 export const Route = createFileRoute('/legal/$page')({
   staticData: { pageId: 'pg_lG9sDf2kHw5M', funnel: { next: [] } },
   loader: ({ params }) => {
+    if (params.page === 'refund') throw notFound()
     const page = PAGES[params.page]
     if (!page) throw notFound()
     return { title: page.title, description: page.description }

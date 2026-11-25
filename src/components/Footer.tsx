@@ -77,11 +77,6 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/legal/$page" params={{ page: 'refund' }} className={link}>
-                {t('footer.refund')}
-              </Link>
-            </li>
-            <li>
               <Link to="/legal/$page" params={{ page: 'cookies' }} className={link}>
                 {t('footer.cookies')}
               </Link>

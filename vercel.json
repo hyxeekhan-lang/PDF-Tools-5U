@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build && node scripts/prerender.mjs",
+  "buildCommand": "npm run migrate:neon && npm run build && node scripts/prerender.mjs",
   "outputDirectory": "dist/client",
   "redirects": [
     { "source": "/tools/remove-pages", "destination": "/tools/delete-pages", "permanent": true },

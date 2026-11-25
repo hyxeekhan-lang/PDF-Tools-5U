@@ -10,7 +10,7 @@ type InstallPrompt = Event & {
 
 declare global {
   interface Window {
-    __pdforaInstallPrompt?: InstallPrompt | null
+    __pdfpilot5uInstallPrompt?: InstallPrompt | null
   }
 }
 
@@ -26,12 +26,12 @@ function publishPrompt(prompt: InstallPrompt | null) {
 function subscribeToInstallPrompt(subscriber: (prompt: InstallPrompt | null) => void) {
   if (!listening) {
     listening = true
-    window.addEventListener('pdfora-install-prompt', () => {
-      publishPrompt(window.__pdforaInstallPrompt ?? null)
+    window.addEventListener('pdfpilot5u-install-prompt', () => {
+      publishPrompt(window.__pdfpilot5uInstallPrompt ?? null)
     })
   }
   subscribers.add(subscriber)
-  const prompt = window.__pdforaInstallPrompt ?? deferredPrompt
+  const prompt = window.__pdfpilot5uInstallPrompt ?? deferredPrompt
   if (prompt !== deferredPrompt) publishPrompt(prompt)
   else subscriber(prompt)
   return () => {
@@ -42,7 +42,7 @@ function subscribeToInstallPrompt(subscriber: (prompt: InstallPrompt | null) => 
 async function requestInstall() {
   const prompt = deferredPrompt
   if (!prompt) return false
-  window.__pdforaInstallPrompt = null
+  window.__pdfpilot5uInstallPrompt = null
   publishPrompt(null)
   await prompt.prompt()
   return (await prompt.userChoice).outcome === 'accepted'
