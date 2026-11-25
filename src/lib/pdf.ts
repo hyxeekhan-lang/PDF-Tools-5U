@@ -1227,6 +1227,65 @@ export async function extractMetadata(file: File, onProgress: Progress) {
   return [{ name: `${baseName(file.name)}-metadata.json`, blob: new Blob([JSON.stringify(value, null, 2)], { type: 'application/json;charset=utf-8' }) }]
 }
 
+export async function checkPdfAccessibility(file: File, onProgress: Progress) {
+  const pdf = await openPdfjs(file)
+  const pages: Array<{ page: number; hasSelectableText: boolean; characterCount: number; width: number; height: number }> = []
+  try {
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+      onProgress((pageNumber - 1) / pdf.numPages, `Checking page ${pageNumber} of ${pdf.numPages}`)
+      const page = await pdf.getPage(pageNumber)
+      const viewport = page.getViewport({ scale: 1 })
+      const content = await page.getTextContent()
+      const text = content.items
+        .filter((item): item is typeof item & { str: string } => 'str' in item && typeof item.str === 'string')
+        .map((item) => item.str)
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+      pages.push({ page: pageNumber, hasSelectableText: Boolean(text), characterCount: text.length, width: Math.round(viewport.width), height: Math.round(viewport.height) })
+      page.cleanup()
+    }
+  } finally {
+    await pdf.destroy()
+  }
+  const issues = pages.flatMap((page) => page.hasSelectableText ? [] : [`Page ${page.page} has no selectable text; it may be scanned or image-only.`])
+  const report = {
+    fileName: file.name,
+    pageCount: pages.length,
+    checks: {
+      readable: true,
+      selectableText: pages.every((page) => page.hasSelectableText),
+      consistentPageSizes: new Set(pages.map((page) => `${page.width}x${page.height}`)).size <= 1,
+      taggedPdf: 'Not verified by this browser checker',
+      languageMetadata: 'Not verified by this browser checker',
+    },
+    issues,
+    pages,
+    note: 'This is a practical browser-level check, not a formal PDF/UA certification. Review the report with an accessibility specialist for compliance decisions.',
+  }
+  return [{ name: `${baseName(file.name)}-accessibility-report.json`, blob: new Blob([JSON.stringify(report, null, 2)], { type: 'application/json;charset=utf-8' }) }]
+}
+
+export async function createPdfForm(file: File, fields: Array<{ name: string; label: string }>, onProgress: Progress) {
+  if (!fields.length) throw err('Add at least one form field.', 'کم از کم ایک فارم فیلڈ شامل کریں۔')
+  const doc = await loadPdf(file)
+  const form = doc.getForm()
+  const page = doc.getPages()[0]
+  const { width } = page.getSize()
+  const fieldWidth = Math.min(260, width - 80)
+  fields.slice(0, 8).forEach((field, index) => {
+    const safeName = field.name.trim().replace(/[^a-zA-Z0-9_.-]+/g, '_') || `field_${index + 1}`
+    const textField = form.createTextField(safeName)
+    textField.setText('')
+    textField.addToPage(page, { x: 40, y: Math.max(40, page.getHeight() - 90 - index * 55), width: fieldWidth, height: 28, borderWidth: 1, borderColor: rgb(0.75, 0.75, 0.75), textColor: rgb(0.08, 0.08, 0.12), backgroundColor: rgb(1, 1, 1) })
+    page.drawText(field.label.trim().slice(0, 120) || safeName, { x: 40, y: Math.max(74, page.getHeight() - 58 - index * 55), size: 11, color: rgb(0.08, 0.08, 0.12) })
+  })
+  onProgress(0.8, 'Saving fillable PDF')
+  const bytes = await doc.save()
+  onProgress(1, 'Done')
+  return [{ name: `${baseName(file.name)}-fillable.pdf`, blob: toBlob(bytes) }]
+}
+
 export async function pdfToPng(file: File, dpi: number, onProgress: Progress) {
   const pdf = await openPdfjs(file)
   const name = baseName(file.name)

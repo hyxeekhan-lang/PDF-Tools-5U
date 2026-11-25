@@ -60,6 +60,8 @@ import {
   PdfToExcelOptions,
   PdfToWordOptions,
   WatermarkOptions,
+  AccessibilityCheckerOptions,
+  PdfFormCreatorOptions,
 } from './options'
 
 const aiOptions = (toolSlug: string) => (props: OptionsProps) => <GeminiOptions files={props.files} toolSlug={toolSlug} />
@@ -98,6 +100,8 @@ const OPTIONS: Record<string, (p: OptionsProps) => React.ReactNode> = {
   'pdf-to-json': PdfToJsonOptions,
   'pdf-to-csv': PdfToCsvOptions,
   'extract-tables': PdfToCsvOptions,
+  'pdf-accessibility-checker': AccessibilityCheckerOptions,
+  'pdf-form-creator': PdfFormCreatorOptions,
   'extract-metadata': MetadataOptions,
   'flatten-pdf': FlattenOptions,
   'optimize-pdf': OptimizeOptions,

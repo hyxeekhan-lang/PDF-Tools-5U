@@ -39,6 +39,8 @@ import {
   pdfToHtml,
   pdfToJson,
   pdfToCsv,
+  checkPdfAccessibility,
+  createPdfForm,
   pdfToMarkdown,
   pdfToPng,
   pdfToPowerpoint,
@@ -802,6 +804,25 @@ export function PdfToCsvOptions({ files, run }: OptionsProps) {
       <ProcessButton onClick={() => run((p) => pdfToCsv(files[0], p))} label={tr('Export CSV', 'CSV بنائیں')} />
     </Panel>
   )
+}
+
+export function AccessibilityCheckerOptions({ files, run }: OptionsProps) {
+  const { tr } = useI18n()
+  return <Panel>
+    <p className="text-sm text-muted">{tr('Creates a browser-level JSON report for selectable text, page dimensions, and image-only pages. It is not formal PDF/UA certification.', 'یہ براؤزر کی سطح پر accessibility رپورٹ بناتا ہے؛ یہ رسمی PDF/UA certification نہیں ہے۔')}</p>
+    <ProcessButton onClick={() => run((p) => checkPdfAccessibility(files[0], p))} label={tr('Check accessibility', 'Accessibility چیک کریں')} />
+  </Panel>
+}
+
+export function PdfFormCreatorOptions({ files, run }: OptionsProps) {
+  const { tr } = useI18n()
+  const [fields, setFields] = useState(['Name', 'Email', 'Comments'])
+  return <Panel>
+    <p className="text-sm text-muted">{tr('Adds up to eight fillable text fields to the first page of your PDF. Keep the original file because fields are placed on a new copy.', 'پہلے صفحے پر زیادہ سے زیادہ آٹھ قابلِ تحریر text fields شامل کریں۔')}</p>
+    <div className="space-y-2">{fields.map((field, index) => <input key={index} className={inputClass} value={field} maxLength={120} aria-label={`Form field ${index + 1} label`} onChange={(event) => setFields((current) => current.map((item, itemIndex) => itemIndex === index ? event.target.value : item))} />)}</div>
+    <button type="button" className="min-h-9 rounded-full border border-line px-3 text-sm" onClick={() => fields.length < 8 && setFields((current) => [...current, `Field ${current.length + 1}`])} disabled={fields.length >= 8}>{tr('Add field', 'فیلڈ شامل کریں')}</button>
+    <ProcessButton disabled={!fields.some((field) => field.trim())} onClick={() => run((p) => createPdfForm(files[0], fields.map((label, index) => ({ name: `field_${index + 1}`, label })), p))} label={tr('Create fillable PDF', 'Fillable PDF بنائیں')} />
+  </Panel>
 }
 
 export function ReorderOptions({ files, run }: OptionsProps) {
