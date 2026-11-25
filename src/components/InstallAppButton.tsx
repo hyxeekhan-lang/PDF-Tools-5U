@@ -170,3 +170,36 @@ export function InstallAppButton({ className = '' }: { className?: string }) {
     </div>
   )
 }
+
+/** A small, dismissible prompt shown only when the browser supports PWA install. */
+export function InstallAppBanner() {
+  const { tr } = useI18n()
+  const [prompt, setPrompt] = useState<InstallPrompt | null>(null)
+  const [dismissed, setDismissed] = useState(false)
+
+  useEffect(() => {
+    try {
+      setDismissed(sessionStorage.getItem('pdfpilot5u-install-banner-dismissed') === '1')
+    } catch { /* storage can be unavailable in private browsing */ }
+    return subscribeToInstallPrompt(setPrompt)
+  }, [])
+
+  if (!prompt || dismissed) return null
+
+  const install = async () => {
+    await requestInstall()
+  }
+  const dismiss = () => {
+    setDismissed(true)
+    try { sessionStorage.setItem('pdfpilot5u-install-banner-dismissed', '1') } catch { /* ignore */ }
+  }
+
+  return (
+    <aside className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-lg items-center gap-3 rounded-2xl border border-line bg-card p-3 shadow-[var(--shadow-soft)] sm:inset-x-auto sm:end-6 sm:w-[min(28rem,calc(100vw-2rem))]" aria-label={tr('Install PDF Pilot 5U', 'PDF Pilot 5U انسٹال کریں')}>
+      <LogoMark className="size-10 shrink-0" />
+      <p className="min-w-0 flex-1 text-sm font-medium text-ink">{tr('Install PDF Pilot 5U for faster access.', 'PDF Pilot 5U کو تیز رسائی کے لیے انسٹال کریں۔')}</p>
+      <button type="button" onClick={() => void install()} className="min-h-10 shrink-0 rounded-full bg-accent px-4 text-sm font-semibold text-white hover:bg-accent-dark">{tr('Install', 'انسٹال')}</button>
+      <button type="button" onClick={dismiss} aria-label={tr('Dismiss install prompt', 'انسٹال کی اطلاع بند کریں')} className="grid size-9 shrink-0 place-items-center rounded-full text-muted hover:bg-blush hover:text-ink"><X className="size-4" /></button>
+    </aside>
+  )
+}

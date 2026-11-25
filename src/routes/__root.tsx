@@ -2,6 +2,7 @@ import { HeadContent, Link, Outlet, Scripts, createRootRoute } from '@tanstack/r
 import { Footer } from '#/components/Footer'
 import { Header } from '#/components/Header'
 import { CookieNotice } from '#/components/CookieNotice'
+import { InstallAppBanner } from '#/components/InstallAppButton'
 import { I18nProvider, bootScript } from '#/lib/i18n'
 import { usePageTransition, useScrollReveal } from '#/lib/motion'
 import '#/lib/sentry'
@@ -115,6 +116,7 @@ function RootLayout() {
         </main>
         <Footer />
         <CookieNotice />
+        <InstallAppBanner />
       </div>
     </I18nProvider>
   )
