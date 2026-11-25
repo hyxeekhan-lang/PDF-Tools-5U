@@ -140,6 +140,10 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
   const [state, setState] = useState<State>({ phase: 'edit' })
   const [dragging, setDragging] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  const cameraVideoRef = useRef<HTMLVideoElement>(null)
+  const cameraStreamRef = useRef<MediaStream | null>(null)
+  const [cameraOpen, setCameraOpen] = useState(false)
   const accept = tool.accepts === 'pdf'
     ? 'application/pdf,.pdf'
     : tool.accepts === 'image'
@@ -232,6 +236,42 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
     setState({ phase: 'edit' })
   }
 
+  const closeCamera = () => {
+    cameraStreamRef.current?.getTracks().forEach((track) => track.stop())
+    cameraStreamRef.current = null
+    setCameraOpen(false)
+  }
+
+  const openCamera = async () => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      cameraInputRef.current?.click()
+      return
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false })
+      cameraStreamRef.current = stream
+      setCameraOpen(true)
+      requestAnimationFrame(() => {
+        if (cameraVideoRef.current) cameraVideoRef.current.srcObject = stream
+      })
+    } catch {
+      setErrors([{ en: 'Camera access was denied or is unavailable. You can upload a document photo instead.', ur: 'کیمرہ دستیاب نہیں یا اجازت نہیں ملی۔ آپ تصویر اپ لوڈ کر سکتے ہیں۔' }])
+      cameraInputRef.current?.click()
+    }
+  }
+
+  const captureCameraPage = async () => {
+    const video = cameraVideoRef.current
+    if (!video || !video.videoWidth) return
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    canvas.getContext('2d')?.drawImage(video, 0, 0)
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92))
+    if (blob) await addFiles([new File([blob], `scan-${Date.now()}.jpg`, { type: 'image/jpeg' })])
+    closeCamera()
+  }
+
   const move = (i: number, dir: -1 | 1) =>
     setFiles((prev) => {
       const next = [...prev]
@@ -260,6 +300,7 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
 
   const cameraPicker = tool.slug === 'scan-to-pdf' ? (
     <input
+      ref={cameraInputRef}
       type="file"
       hidden
       accept="image/jpeg,image/png"
@@ -411,7 +452,7 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
           {tool.slug === 'scan-to-pdf' && (
             <button
               type="button"
-              onClick={(e) => (e.currentTarget.previousElementSibling as HTMLButtonElement | null)?.focus() || (e.currentTarget.parentElement?.querySelector('input[capture]') as HTMLInputElement | null)?.click()}
+              onClick={openCamera}
               className="press relative mt-3 inline-flex min-h-12 items-center gap-2 rounded-full border border-accent px-7 font-semibold text-accent hover:bg-blush"
             >
               <Camera className="size-5" aria-hidden="true" /> Scan with camera
@@ -485,6 +526,17 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
           </button>
         )}
       </div>
+      {cameraOpen && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/75 p-4" role="dialog" aria-modal="true" aria-label="Document camera">
+          <div className="w-full max-w-lg rounded-3xl bg-paper p-4 shadow-2xl">
+            <video ref={cameraVideoRef} autoPlay playsInline muted className="aspect-[3/4] w-full rounded-2xl bg-ink object-cover" />
+            <div className="mt-4 flex justify-end gap-3">
+              <button type="button" onClick={closeCamera} className="min-h-11 rounded-full border border-line px-5 font-semibold">Cancel</button>
+              <button type="button" onClick={captureCameraPage} className="min-h-11 rounded-full bg-accent px-5 font-semibold text-white">Capture page</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {errorList}
 
