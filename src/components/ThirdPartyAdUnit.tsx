@@ -37,24 +37,19 @@ export function ThirdPartyAdUnit({ slot, label = 'Advertisements' }: { slot: 1 |
     const key = `${providerHost}|${unit.key}`
     window.__pdfpilotThirdPartyAdLoaded ??= new Set()
     if (window.__pdfpilotThirdPartyAdLoaded.has(key)) return
-    // These provider units read the global atOptions object while their script
-    // executes. Keep each unit synchronous so a later slot cannot overwrite it
-    // during an async race.
-    const options = document.createElement('script')
-    options.text = `window.atOptions={key:'${unit.key}',format:'iframe',height:${unit.height},width:${unit.width},params:{}};`
-    ref.current.appendChild(options)
-    const script = document.createElement('script')
-    script.async = false
-    script.defer = false
-    script.dataset.cfasync = 'false'
-    script.src = `https://${providerHost}/22/${unit.key}`
-    script.dataset.pdfpilotThirdPartyAd = 'true'
-    ref.current.appendChild(script)
+    // Each unit gets its own document so the provider's global atOptions object
+    // cannot be overwritten by another slot on the same page.
     window.__pdfpilotThirdPartyAdLoaded.add(key)
   }, [allowed, configured])
 
   if (!configured || !allowed) return null
   return <aside className="my-10 flex min-h-24 items-center justify-center overflow-hidden text-center" aria-label={label}>
-    <div><span className="mb-2 block text-xs uppercase tracking-wider text-muted">{label}</span><div ref={ref} style={{ minHeight: unit.height, maxWidth: '100%', overflow: 'hidden' }} /></div>
+    <div><span className="mb-2 block text-xs uppercase tracking-wider text-muted">{label}</span><div ref={ref} style={{ minHeight: unit.height, maxWidth: '100%', overflow: 'hidden' }}><iframe
+      title={`${label} ${unit.width} by ${unit.height}`}
+      sandbox="allow-scripts allow-forms"
+      loading="lazy"
+      srcDoc={`<!doctype html><html><body style="margin:0;display:flex;justify-content:center;overflow:hidden"><script>window.atOptions={key:'${unit.key}',format:'iframe',height:${unit.height},width:${unit.width},params:{}};<\/script><script async data-cfasync="false" src="https://${providerHost}/22/${unit.key}"><\/script></body></html>`}
+      style={{ display: 'block', width: '100%', maxWidth: unit.width, height: unit.height, border: 0, margin: '0 auto' }}
+    /></div>
   </aside>
 }
