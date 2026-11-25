@@ -116,11 +116,11 @@ function ToolPage() {
                 <p className="mt-3 leading-relaxed text-muted">Follow these steps to get a reliable result from {pick(tool.name)}.</p>
               </div>
               <ol className="mt-5 max-w-3xl list-inside list-decimal space-y-2 leading-relaxed text-muted">
-                <li>
-                  Choose {tool.multiple ? 'one or more' : 'a'} {tool.accepts === 'pdf' ? 'PDF' : tool.accepts.toUpperCase()} file{tool.multiple ? 's' : ''} from your device.
-                </li>
-                <li>Review the preview and available options before processing.</li>
-                <li>Run the tool, inspect the result, and download it only if it looks correct.</li>
+                <li>Choose {tool.multiple ? 'one or more' : 'a'} {tool.accepts === 'pdf' ? 'PDF' : tool.accepts.toUpperCase()} file{tool.multiple ? 's' : ''} from your device.</li>
+                <li>Confirm the selected file names, page order, or preview before changing any options.</li>
+                <li>Choose settings that match the document and the result you need from {pick(tool.name)}.</li>
+                <li>Start processing and keep this browser tab open until the progress indicator finishes.</li>
+                <li>Open the downloaded result, compare it with the original, and keep the source as a backup.</li>
               </ol>
               {tool.note && <p className="mt-4 rounded-xl bg-blush px-4 py-3 text-sm leading-relaxed">{pick(tool.note)}</p>}
               <p className="mt-4 text-sm leading-relaxed text-muted">

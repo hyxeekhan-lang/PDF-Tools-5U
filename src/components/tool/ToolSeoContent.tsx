@@ -44,15 +44,19 @@ export function ToolStepPreview({ tool }: { tool: Tool }) {
 }
 
 export function ToolSeoIntro({ tool }: { tool: Tool }) {
+  const useCase = tool.category === 'ai'
+    ? `Use ${tool.name.en} when you need a focused answer or transformation from selectable PDF text and are comfortable reviewing an AI-generated result.`
+    : tool.category === 'convert-to' || tool.category === 'convert-from'
+      ? `Use ${tool.name.en} for a quick browser-based conversion when you need a shareable document in a different format.`
+      : `Use ${tool.name.en} when you need to prepare, review, organize, or secure a PDF without changing the original file.`
   return (
     <section className="mt-12 border-t border-line pt-8" aria-labelledby="tool-explanation-heading">
       <div className="max-w-3xl">
-        <p className="text-sm font-semibold tracking-wide text-accent uppercase">Tool overview</p>
+        <p className="text-sm font-semibold tracking-wide text-accent uppercase">User guide</p>
         <h2 id="tool-explanation-heading" className="mt-2 font-display text-2xl font-bold">About {tool.name.en}</h2>
         <p className="mt-3 text-lg leading-relaxed text-muted">{tool.desc.en}</p>
         <p className="mt-4 leading-relaxed text-muted">
-          Upload {tool.multiple ? `one or more ${fileLabel(tool)} files` : `a ${fileLabel(tool)} file`} using the workspace above.
-          Review the available settings and preview, then keep your original file and check the downloaded result before sharing it.
+          {useCase} Upload {tool.multiple ? `one or more ${fileLabel(tool)} files` : `a ${fileLabel(tool)} file`} using the workspace above, then compare the output with your original before sharing it.
         </p>
       </div>
     </section>
@@ -69,7 +73,7 @@ export function ToolSeoDetails({ tool }: { tool: Tool }) {
   return (
     <>
       <section className="mt-12 border-t border-line pt-8" aria-labelledby="tool-features-heading">
-        <h2 id="tool-features-heading" className="font-display text-2xl font-bold">Features and benefits</h2>
+        <h2 id="tool-features-heading" className="font-display text-2xl font-bold">Key features</h2>
         <ul className="mt-5 grid gap-3 sm:grid-cols-3">
           {features.map((feature, index) => {
             const Icon = index === 0 ? FileCheck2 : index === 1 ? CheckCircle2 : ShieldCheck
@@ -84,6 +88,18 @@ export function ToolSeoDetails({ tool }: { tool: Tool }) {
           })}
         </ul>
         {tool.note && <p className="mt-5 rounded-xl bg-blush px-4 py-3 text-sm leading-relaxed">{tool.note.en}</p>}
+      </section>
+      <section className="mt-12 border-t border-line pt-8" aria-labelledby="tool-use-cases-heading">
+        <h2 id="tool-use-cases-heading" className="font-display text-2xl font-bold">Common use cases</h2>
+        <ul className="mt-5 grid gap-3 sm:grid-cols-3">
+          <li className="rounded-xl border border-line bg-card p-4 text-sm leading-relaxed text-muted">Prepare a document for email, review, or archiving.</li>
+          <li className="rounded-xl border border-line bg-card p-4 text-sm leading-relaxed text-muted">Check a result before sending it to another person or service.</li>
+          <li className="rounded-xl border border-line bg-card p-4 text-sm leading-relaxed text-muted">Repeat the same {tool.name.en.toLowerCase()} workflow on a later document.</li>
+        </ul>
+      </section>
+      <section className="mt-12 border-t border-line pt-8" aria-labelledby="tool-limitations-heading">
+        <h2 id="tool-limitations-heading" className="font-display text-2xl font-bold">Supported formats and limitations</h2>
+        <p className="mt-3 leading-relaxed text-muted">Accepted input: {fileLabel(tool)}{tool.multiple ? ' files can be selected together.' : '.'} {tool.desc.en} Large or complex files may depend on available browser memory. Keep the source file and inspect the downloaded output.</p>
       </section>
       <section className="mt-12 border-t border-line pt-8" aria-labelledby="tool-faq-heading">
         <h2 id="tool-faq-heading" className="font-display text-2xl font-bold">Frequently asked questions</h2>
@@ -101,8 +117,12 @@ export function ToolSeoDetails({ tool }: { tool: Tool }) {
             <p className="mt-2 leading-relaxed text-muted">{ai ? 'The PDF stays in your browser while selectable text is extracted. Text is sent to Google Gemini only after your explicit consent; review the response before relying on it.' : 'The operation runs in your browser. Keep your original and inspect the generated download, especially for complex layouts or scanned pages.'}</p>
           </details>
           <details className="group py-4">
-            <summary className="cursor-pointer font-semibold">Can I undo a downloaded result?</summary>
-            <p className="mt-2 leading-relaxed text-muted">Processing does not overwrite your source file. Start again with the original if you need a different result or settings.</p>
+            <summary className="cursor-pointer font-semibold">What should I check before using the result?</summary>
+            <p className="mt-2 leading-relaxed text-muted">Check page count, visible content, reading order, links, forms, and text quality that matter for {tool.name.en.toLowerCase()}. Processing does not overwrite your source file.</p>
+          </details>
+          <details className="group py-4">
+            <summary className="cursor-pointer font-semibold">Can I use the output for an official document?</summary>
+            <p className="mt-2 leading-relaxed text-muted">Only after you review it against the original and any requirements from the receiving organization. This tool does not certify legal, accessibility, archival, or regulatory compliance.</p>
           </details>
         </div>
       </section>
