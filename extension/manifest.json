@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "PDF Pilot 5U",
+  "version": "1.0.0",
+  "description": "Quick access to PDF Pilot 5U browser-based PDF tools.",
+  "action": {
+    "default_title": "PDF Pilot 5U",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "permissions": ["contextMenus"],
+  "host_permissions": ["https://pdfpilot5u.vercel.app/*"]
+}

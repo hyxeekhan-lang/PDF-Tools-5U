@@ -1,0 +1,15 @@
+:root { color-scheme: light; font-family: Inter, Arial, sans-serif; }
+* { box-sizing: border-box; }
+body { width: 320px; margin: 0; background: #fffcfb; color: #101828; }
+header { display: flex; align-items: center; gap: 12px; padding: 18px 18px 14px; border-bottom: 1px solid #f2e4e1; }
+header strong, header span { display: block; }
+header strong { font-size: 15px; }
+header span { margin-top: 3px; color: #667085; font-size: 12px; }
+.logo { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: #d92d20; color: white; font-size: 27px; line-height: 1; }
+main { padding: 16px 18px; }
+a { color: inherit; cursor: pointer; text-decoration: none; }
+.primary { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 12px; background: #d92d20; color: white; font-size: 13px; font-weight: 700; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.grid a { padding: 11px 10px; border: 1px solid #f2e4e1; border-radius: 10px; background: white; color: #344054; font-size: 12px; font-weight: 600; }
+a:hover { opacity: .82; }
+footer { padding: 12px 18px 16px; border-top: 1px solid #f2e4e1; color: #d92d20; font-size: 12px; font-weight: 600; text-align: center; }
