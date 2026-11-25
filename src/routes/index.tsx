@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Check, Download, FileCheck2, Gift, Lock, LockKeyhole, MonitorSmartphone, ScanText, ShieldCheck, UserX } from 'lucide-react'
+import { Camera, Check, Download, FileCheck2, Gift, Lock, LockKeyhole, MonitorSmartphone, ScanText, ShieldCheck, UserX } from 'lucide-react'
 import { AllTools } from '#/components/AllTools'
 import { AdSenseUnit } from '#/components/AdSenseUnit'
 import { HeroUpload } from '#/components/HeroUpload'
@@ -156,6 +156,16 @@ function Hero() {
             })}
           </div>
         </div>
+        <Link
+          to="/tools/$slug"
+          params={{ slug: 'scan-to-pdf' }}
+          className="animate-fade-up mx-auto mt-8 flex max-w-xl items-center gap-4 rounded-2xl border border-accent/25 bg-blush p-4 text-left shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-accent/50"
+          style={stagger(860)}
+        >
+          <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-accent text-white"><Camera className="size-6" aria-hidden="true" /></span>
+          <span className="min-w-0 flex-1"><span className="block text-xs font-bold tracking-wide text-accent-dark uppercase">New featured tool</span><span className="mt-0.5 block font-display text-lg font-bold">Scan documents with your camera</span><span className="mt-0.5 block text-sm text-muted">Capture pages and create a PDF privately in your browser.</span></span>
+          <span className="shrink-0 text-lg font-bold text-accent" aria-hidden="true">→</span>
+        </Link>
       </div>
     </section>
   )
