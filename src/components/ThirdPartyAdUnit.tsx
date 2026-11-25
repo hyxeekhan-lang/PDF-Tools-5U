@@ -37,11 +37,16 @@ export function ThirdPartyAdUnit({ slot, label = 'Advertisements' }: { slot: 1 |
     const key = `${providerHost}|${unit.key}`
     window.__pdfpilotThirdPartyAdLoaded ??= new Set()
     if (window.__pdfpilotThirdPartyAdLoaded.has(key)) return
+    // These provider units read the global atOptions object while their script
+    // executes. Keep each unit synchronous so a later slot cannot overwrite it
+    // during an async race.
     const options = document.createElement('script')
     options.text = `window.atOptions={key:'${unit.key}',format:'iframe',height:${unit.height},width:${unit.width},params:{}};`
     ref.current.appendChild(options)
     const script = document.createElement('script')
-    script.async = true
+    script.async = false
+    script.defer = false
+    script.dataset.cfasync = 'false'
     script.src = `https://${providerHost}/22/${unit.key}`
     script.dataset.pdfpilotThirdPartyAd = 'true'
     ref.current.appendChild(script)
