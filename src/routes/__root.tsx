@@ -4,6 +4,7 @@ import { Header } from '#/components/Header'
 import { CookieNotice } from '#/components/CookieNotice'
 import { I18nProvider, bootScript } from '#/lib/i18n'
 import { usePageTransition, useScrollReveal } from '#/lib/motion'
+import '#/lib/sentry'
 
 import appCss from '../styles.css?url'
 
