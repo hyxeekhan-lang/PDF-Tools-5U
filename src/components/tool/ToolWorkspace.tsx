@@ -465,6 +465,17 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
               : t('page.localNote')}
           </p>
         </div>
+        {cameraOpen && (
+          <div className="fixed inset-0 z-50 grid place-items-center bg-ink/75 p-4" role="dialog" aria-modal="true" aria-label="Document camera">
+            <div className="w-full max-w-lg rounded-3xl bg-paper p-4 shadow-2xl">
+              <video ref={cameraVideoRef} autoPlay playsInline muted className="aspect-[3/4] w-full rounded-2xl bg-ink object-cover" />
+              <div className="mt-4 flex justify-end gap-3">
+                <button type="button" onClick={closeCamera} className="min-h-11 rounded-full border border-line px-5 font-semibold">Cancel</button>
+                <button type="button" onClick={captureCameraPage} className="min-h-11 rounded-full bg-accent px-5 font-semibold text-white">Capture page</button>
+              </div>
+            </div>
+          </div>
+        )}
         {errorList}
       </div>
     )
