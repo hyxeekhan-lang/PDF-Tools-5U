@@ -1050,7 +1050,9 @@ export async function addLinkPreviewToPdf(file: File, url: string, onProgress: P
     page.drawText('OPEN LINK', { x: x + 12, y: y + 28, size: 8, font, color: rgb(0.85, 0.12, 0.08) })
     page.drawText(value, { x: x + 12, y: y + 12, size: 9, font, color: rgb(0.08, 0.12, 0.2), maxWidth: width - 24 })
     const annotation = doc.context.obj({ Type: 'Annot', Subtype: 'Link', Rect: [x, y, x + width, y + height], Border: [0, 0, 0], A: { Type: 'Action', S: 'URI', URI: PDFString.of(value) } })
-    page.node.set(PDFName.of('Annots'), PDFArray.withContext(doc.context, [annotation]))
+    const annotations = PDFArray.withContext(doc.context)
+    annotations.push(annotation)
+    page.node.set(PDFName.of('Annots'), annotations)
     onProgress((index + 1) / pages.length)
   })
   return [{ name: `${baseName(file.name)}-link-preview.pdf`, blob: toBlob(await doc.save()) }]
