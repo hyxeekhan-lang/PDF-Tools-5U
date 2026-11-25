@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Check, Download, FileCheck2, Gift, Lock, LockKeyhole, MonitorSmartphone, ScanText, ShieldCheck, Star, UserX } from 'lucide-react'
+import { Check, Download, FileCheck2, Gift, Lock, LockKeyhole, MonitorSmartphone, ScanText, ShieldCheck, UserX } from 'lucide-react'
 import { AllTools } from '#/components/AllTools'
 import { AdSenseUnit } from '#/components/AdSenseUnit'
 import { HeroUpload } from '#/components/HeroUpload'
