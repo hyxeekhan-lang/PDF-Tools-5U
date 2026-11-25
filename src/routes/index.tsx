@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Check, FileCheck2, Gift, Lock, LockKeyhole, MonitorSmartphone, ScanText, ShieldCheck, UserX } from 'lucide-react'
+import { Check, Download, FileCheck2, Gift, Lock, LockKeyhole, MonitorSmartphone, ScanText, ShieldCheck, Star, UserX } from 'lucide-react'
 import { AllTools } from '#/components/AllTools'
 import { AdSenseUnit } from '#/components/AdSenseUnit'
 import { HeroUpload } from '#/components/HeroUpload'
@@ -7,6 +7,7 @@ import { DownloadArt, HeroDecor, ProcessArt, Squiggle, StepArrow, UploadArt } fr
 import { ToolSearch } from '#/components/ToolSearch'
 import { type TKey, useI18n } from '#/lib/i18n'
 import { POPULAR, getTool } from '#/lib/tools'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/')({
   staticData: { pageId: 'pg_hM1qXe5rTz8C', funnel: { next: [] } },
@@ -37,9 +38,50 @@ function Home() {
       <How />
       <Security />
       <CapabilityStrip />
+      <AppDownloadAndReviews />
       <Pricing />
       <Faq />
     </>
+  )
+}
+
+function AppDownloadAndReviews() {
+  const [sent, setSent] = useState(false)
+  const submit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    const subject = `[PDF Pilot 5U Review] ${String(data.get('rating') ?? '5')} stars`
+    const body = `Name: ${data.get('name')}\nEmail: ${data.get('email')}\nRating: ${data.get('rating')}/5\n\nReview:\n${data.get('review')}`
+    window.location.href = `mailto:hyxeekhan@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    setSent(true)
+  }
+  return (
+    <section className="border-y border-line bg-card">
+      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-20 lg:grid-cols-2 lg:px-8">
+        <article className="rounded-card border border-line bg-paper p-7 shadow-[var(--shadow-soft)] md:p-9">
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-accent text-white"><Download className="size-6" aria-hidden="true" /></div>
+          <h2 className="mt-5 font-display text-2xl font-extrabold">Use PDF Pilot 5U on Android</h2>
+          <p className="mt-3 leading-relaxed text-muted">Download the official PDF Pilot 5U Android wrapper for quick access to browser-based PDF tools on your phone.</p>
+          <a href="/downloads/pdf-pilot-5u.apk" download className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-full bg-accent px-6 font-semibold text-white hover:bg-accent-dark"><Download className="size-4" aria-hidden="true" /> Download APK</a>
+          <p className="mt-3 text-xs text-muted">APK package: com.webapp.pdfpilot5u · Android app download</p>
+        </article>
+        <article className="rounded-card border border-line bg-paper p-7 shadow-[var(--shadow-soft)] md:p-9">
+          <p className="text-sm font-semibold tracking-wide text-accent uppercase">Share your experience</p>
+          <h2 className="mt-2 font-display text-2xl font-extrabold">Leave a review</h2>
+          <p className="mt-3 leading-relaxed text-muted">Send your verified feedback. Reviews are checked before being published; no fake reviews are displayed.</p>
+          <form onSubmit={submit} className="mt-5 grid gap-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <input required name="name" maxLength={100} placeholder="Your name" aria-label="Your name" className="min-h-11 rounded-xl border border-line bg-card px-3 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" />
+              <input required type="email" name="email" maxLength={254} placeholder="Email address" aria-label="Email address" className="min-h-11 rounded-xl border border-line bg-card px-3 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            </div>
+            <select name="rating" aria-label="Rating" className="min-h-11 rounded-xl border border-line bg-card px-3 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"><option value="5">★★★★★ 5 stars</option><option value="4">★★★★☆ 4 stars</option><option value="3">★★★☆☆ 3 stars</option><option value="2">★★☆☆☆ 2 stars</option><option value="1">★☆☆☆☆ 1 star</option></select>
+            <textarea required name="review" maxLength={1000} rows={3} placeholder="Write your review" aria-label="Write your review" className="rounded-xl border border-line bg-card px-3 py-3 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            <button type="submit" className="min-h-11 rounded-full bg-accent px-5 font-semibold text-white hover:bg-accent-dark">Submit review</button>
+            {sent && <p role="status" className="text-sm font-semibold text-accent-dark">Your email draft is ready. We will review your feedback before publishing it.</p>}
+          </form>
+        </article>
+      </div>
+    </section>
   )
 }
 
