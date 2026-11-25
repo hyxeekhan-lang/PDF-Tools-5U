@@ -90,16 +90,16 @@ export function ToolSeoDetails({ tool }: { tool: Tool }) {
         {tool.note && <p className="mt-5 rounded-xl bg-blush px-4 py-3 text-sm leading-relaxed">{tool.note.en}</p>}
       </section>
       <section className="mt-12 border-t border-line pt-8" aria-labelledby="tool-use-cases-heading">
-        <h2 id="tool-use-cases-heading" className="font-display text-2xl font-bold">Common use cases</h2>
+        <div className="flex items-center gap-3"><span className="grid size-11 place-items-center rounded-xl bg-accent text-white" aria-hidden="true"><svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 5h16M4 12h16M4 19h10" /></svg></span><h2 id="tool-use-cases-heading" className="font-display text-2xl font-bold text-accent">Common use cases</h2></div>
         <ul className="mt-5 grid gap-3 sm:grid-cols-3">
-          <li className="rounded-xl border border-line bg-card p-4 text-sm leading-relaxed text-muted">Prepare a document for email, review, or archiving.</li>
-          <li className="rounded-xl border border-line bg-card p-4 text-sm leading-relaxed text-muted">Check a result before sending it to another person or service.</li>
-          <li className="rounded-xl border border-line bg-card p-4 text-sm leading-relaxed text-muted">Repeat the same {tool.name.en.toLowerCase()} workflow on a later document.</li>
+          <li className="rounded-xl border border-accent/25 bg-blush p-4 text-sm leading-relaxed text-muted"><span className="mb-3 block text-accent" aria-hidden="true">◆</span>Prepare a document for email, review, or archiving.</li>
+          <li className="rounded-xl border border-accent/25 bg-blush p-4 text-sm leading-relaxed text-muted"><span className="mb-3 block text-accent" aria-hidden="true">◆</span>Check a result before sending it to another person or service.</li>
+          <li className="rounded-xl border border-accent/25 bg-blush p-4 text-sm leading-relaxed text-muted"><span className="mb-3 block text-accent" aria-hidden="true">◆</span>Repeat the same {tool.name.en.toLowerCase()} workflow on a later document.</li>
         </ul>
       </section>
       <section className="mt-12 border-t border-line pt-8" aria-labelledby="tool-limitations-heading">
-        <h2 id="tool-limitations-heading" className="font-display text-2xl font-bold">Supported formats and limitations</h2>
-        <p className="mt-3 leading-relaxed text-muted">Accepted input: {fileLabel(tool)}{tool.multiple ? ' files can be selected together.' : '.'} {tool.desc.en} Large or complex files may depend on available browser memory. Keep the source file and inspect the downloaded output.</p>
+        <div className="flex items-center gap-3"><span className="grid size-11 place-items-center rounded-xl border-2 border-accent text-accent" aria-hidden="true"><svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3 3 7l9 4 9-4-9-4Z" /><path d="m3 12 9 4 9-4M3 17l9 4 9-4" /></svg></span><h2 id="tool-limitations-heading" className="font-display text-2xl font-bold text-accent">Supported formats and limitations</h2></div>
+        <p className="mt-4 rounded-2xl border border-accent/20 bg-blush p-5 leading-relaxed text-muted">Accepted input: {fileLabel(tool)}{tool.multiple ? ' files can be selected together.' : '.'} {tool.desc.en} Large or complex files may depend on available browser memory. Keep the source file and inspect the downloaded output.</p>
       </section>
       <section className="mt-12 border-t border-line pt-8" aria-labelledby="tool-faq-heading">
         <h2 id="tool-faq-heading" className="font-display text-2xl font-bold">Frequently asked questions</h2>

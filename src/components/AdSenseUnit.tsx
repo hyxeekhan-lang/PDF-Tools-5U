@@ -11,7 +11,7 @@ const configured = /^pub-\d{16}$/.test(publisherId) && Object.values(slots).ever
 
 export function AdSenseUnit({ slot }: { slot: 1 | 2 | 3 }) {
   const [allowed, setAllowed] = useState(false)
-  const adRef = useRef<HTMLElement>(null)
+  const adRef = useRef<HTMLModElement>(null)
   const hasSlot = configured && Boolean(slots[slot])
 
   useEffect(() => {
