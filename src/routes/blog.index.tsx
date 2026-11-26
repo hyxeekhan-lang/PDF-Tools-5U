@@ -33,7 +33,7 @@ function Blog() {
     <PageShell
       eyebrow={t('nav.blog')}
       title="Practical PDF guides"
-      intro="Original, step-by-step articles about PDF workflows, output quality, privacy, and the limits of common conversions. Each guide includes a preview and its reading length."
+      intro="Original, independently written guides about PDF workflows, output quality, privacy, and the limits of common conversions. Every article explains the practical steps, trade-offs, and checks that matter before you share a document."
     >
       <ul className="grid gap-5 md:grid-cols-2">
         {POSTS.map((post) => (
@@ -52,9 +52,9 @@ function Blog() {
                 </span>
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-accent">{post.date}</p>
-                  <p className="mt-1 text-sm font-medium text-muted">
-                    {getPostWordCount(post).toLocaleString()} words · {getReadingMinutes(post)} min read
-                  </p>
+                <p className="mt-1 text-sm font-medium text-muted">
+                  PDF Pilot 5U guide · {getPostWordCount(post).toLocaleString()} words · {getReadingMinutes(post)} min read
+                </p>
                 </div>
               </div>
               <div className="flex flex-1 flex-col p-6">

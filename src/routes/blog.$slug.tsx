@@ -41,7 +41,10 @@ function PostPage() {
       title={post.title}
       intro={post.summary}
     >
-      <p className="mb-8 rounded-xl border border-line bg-card p-5 leading-relaxed text-muted">{post.preview}</p>
+      <div className="mb-8 grid gap-4 rounded-2xl border border-line bg-card p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-6">
+        <p className="leading-relaxed text-muted">{post.preview}</p>
+        <p className="rounded-full bg-blush px-4 py-2 text-center text-xs font-semibold text-accent">Original PDF Pilot 5U guide</p>
+      </div>
       <nav aria-label="Article contents" className="mb-10 rounded-2xl bg-blush p-5">
         <h2 className="font-display font-bold">In this guide</h2>
         <ol className="mt-3 list-inside list-decimal space-y-2 text-sm leading-relaxed">
