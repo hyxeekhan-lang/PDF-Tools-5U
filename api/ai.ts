@@ -10,6 +10,7 @@ type AiBody = {
   targetLanguage?: string
   messages?: ChatMessage[]
   image?: { mimeType?: string; data?: string }
+  language?: 'English' | 'Urdu'
 }
 
 type ApiRequest = IncomingMessage & { body?: unknown }
@@ -152,7 +153,7 @@ function taskFor(body: AiBody) {
       return `Continue this document question-and-answer conversation. Use only the document as evidence. If it does not answer a question, say so. Conversation:\n${messages.map((message) => `${message.role === 'user' ? 'User' : 'Assistant'}: ${message.content}`).join('\n')}`
     }
     case 'recipe-scanner':
-      return 'Read the recipe or food label in the image and return a clear Markdown report with: recipe name, servings, prep time, cook time, ingredients, numbered steps, dietary/allergen notes, and uncertainty. Transcribe only what is visible; mark missing details as unknown. Do not provide medical advice or invent nutrition values.'
+      return `Read the recipe or food label in the image and return a clear Markdown report with: recipe name, servings, prep time, cook time, ingredients, numbered steps, dietary/allergen notes, and uncertainty. Transcribe only what is visible; mark missing details as unknown. Do not provide medical advice or invent nutrition values. Write the report in ${body.language === 'Urdu' ? 'Urdu' : 'English'}.`
     default:
       return null
   }

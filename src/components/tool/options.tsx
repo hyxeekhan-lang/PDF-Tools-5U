@@ -62,6 +62,7 @@ import {
   processImage,
   createBarcodeSvg,
 } from '#/lib/pdf'
+import { Sentry } from '#/lib/sentry'
 import { ReorderGrid, SelectGrid } from './PageGrid'
 import { Field, ProcessButton, Segmented, Slider, inputClass } from './controls'
 import { usePdfThumbs } from './usePdfThumbs'
@@ -147,6 +148,7 @@ export function RecipeScannerOptions({ files, run }: OptionsProps) {
   const [consent, setConsent] = useState(false)
   const [result, setResult] = useState('')
   const [previewUrl, setPreviewUrl] = useState('')
+  const [language, setLanguage] = useState<'English' | 'Urdu'>('English')
   useEffect(() => {
     setResult('')
     if (!files[0]) { setPreviewUrl(''); return }
@@ -157,6 +159,7 @@ export function RecipeScannerOptions({ files, run }: OptionsProps) {
   return <Panel>
     {previewUrl && <figure className="overflow-hidden rounded-2xl border border-line bg-paper p-3"><img src={previewUrl} alt="Recipe image preview" className="mx-auto max-h-64 rounded-xl object-contain" /><figcaption className="mt-2 text-center text-xs text-muted">Preview — review the image before sending</figcaption></figure>}
     <p className="text-sm leading-relaxed text-muted">{tr('Recipe Scanner uses Google Gemini to read one food image. Your image is sent only after consent; results may be incomplete and are not medical advice.', 'Recipe Scanner فوڈ تصویر کو Google Gemini سے پڑھتا ہے۔ تصویر اجازت کے بعد بھیجی جاتی ہے؛ نتائج نامکمل ہو سکتے ہیں اور طبی مشورہ نہیں ہیں۔')}</p>
+    <label className="block space-y-2 text-sm font-semibold"><span>Result language</span><select className={inputClass} value={language} onChange={(event) => setLanguage(event.target.value as 'English' | 'Urdu')}><option>English</option><option>Urdu</option></select></label>
     <label className="flex items-start gap-3 rounded-xl border border-line bg-paper p-4 text-sm">
       <input type="checkbox" className="mt-0.5 size-4 accent-accent" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
       <span>{tr('I agree to send this image to Google Gemini for recipe analysis.', 'میں اس تصویر کو Google Gemini کو بھیجنے کی اجازت دیتا/دیتی ہوں۔')}</span>
@@ -170,12 +173,18 @@ export function RecipeScannerOptions({ files, run }: OptionsProps) {
         ? await prepareRecipeImage(file)
         : { mimeType: file.type, data: await fileToBase64(file) }
       progress(0.45, 'Gemini is reading the recipe')
-      const response = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'recipe-scanner', image: prepared }) })
+      const response = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'recipe-scanner', language, image: prepared }) }).catch((error) => { Sentry.captureException(error); throw error })
       const result = await response.json() as { text?: string; error?: string }
       if (!response.ok || !result.text) throw new Error(result.error || 'Recipe scanning failed. Try a clearer image.')
       setResult(result.text)
       progress(1, 'Recipe scan complete')
-      return [{ name: 'recipe-scan-result.md', blob: new Blob([result.text], { type: 'text/markdown;charset=utf-8' }) }]
+      const textFile = new File([result.text], 'recipe-scan-result.txt', { type: 'text/plain;charset=utf-8' })
+      const pdf = await textToPdf(textFile, (fraction, label) => progress(0.9 + fraction * 0.1, label))
+      return [
+        { name: 'recipe-scan-result.md', blob: new Blob([result.text], { type: 'text/markdown;charset=utf-8' }) },
+        { name: 'recipe-scan-result.txt', blob: textFile },
+        ...pdf.map((output) => ({ ...output, name: 'recipe-scan-result.pdf' })),
+      ]
     })} label={tr('Scan recipe with Gemini', 'Gemini سے recipe scan کریں')} />
     {result && <section className="rounded-2xl border border-accent/20 bg-paper p-5" aria-live="polite"><h3 className="font-display text-lg font-bold text-accent">Recipe result</h3><div className="mt-3 whitespace-pre-wrap text-sm leading-7 text-ink">{result}</div><p className="mt-4 text-xs text-muted">Review ingredients and allergen information before relying on this result.</p></section>}
   </Panel>
