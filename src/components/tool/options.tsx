@@ -115,6 +115,24 @@ export function BarcodeOptions({ run }: OptionsProps) {
   )
 }
 
+async function prepareRecipeImage(file: File) {
+  const bitmap = await createImageBitmap(file)
+  const maxDimension = 1600
+  const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height))
+  const width = Math.max(1, Math.round(bitmap.width * scale))
+  const height = Math.max(1, Math.round(bitmap.height * scale))
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const context = canvas.getContext('2d')
+  if (!context) throw new Error('Your browser could not prepare the image.')
+  context.drawImage(bitmap, 0, 0, width, height)
+  bitmap.close()
+  const outputType = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
+  const dataUrl = canvas.toDataURL(outputType, outputType === 'image/jpeg' ? 0.84 : undefined)
+  return { mimeType: outputType, data: dataUrl.replace(/^data:[^;]+;base64,/, '') }
+}
+
 function fileToBase64(file: File) {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
@@ -138,9 +156,11 @@ export function RecipeScannerOptions({ files, run }: OptionsProps) {
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Choose a JPG, PNG, or WebP image.')
       if (file.size > 9 * 1024 * 1024) throw new Error('For AI scanning, choose an image smaller than 9 MB.')
       progress(0.2, 'Preparing image for Gemini')
-      const data = await fileToBase64(file)
+      const prepared = typeof createImageBitmap === 'function'
+        ? await prepareRecipeImage(file)
+        : { mimeType: file.type, data: await fileToBase64(file) }
       progress(0.45, 'Gemini is reading the recipe')
-      const response = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'recipe-scanner', image: { mimeType: file.type, data } }) })
+      const response = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'recipe-scanner', image: prepared }) })
       const result = await response.json() as { text?: string; error?: string }
       if (!response.ok || !result.text) throw new Error(result.error || 'Recipe scanning failed. Try a clearer image.')
       progress(1, 'Recipe scan complete')
