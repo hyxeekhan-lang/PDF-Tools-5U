@@ -69,7 +69,12 @@ export type PdfToolIconName =
   "ai-document-qa" |
   "ai-document-translator" |
   "ai-key-points" |
-  "ai-report-generator";
+  "ai-report-generator" |
+  "image-compressor" |
+  "image-resizer" |
+  "jpg-to-png" |
+  "png-to-jpg" |
+  "webp-converter";
 
 type IconData = { label: string; glyph: ReactNode };
 
@@ -331,6 +336,26 @@ export const PDF_TOOL_ICONS: Record<PdfToolIconName, IconData> = {
   "ai-report-generator": {
     label: "AI Report Generator",
     glyph: <><path d="M3 3v16a2 2 0 0 0 2 2h16" /><path d="M18 17V9" /><path d="M13 17V5" /><path d="M8 17v-3" /></>,
+  },
+  "image-compressor": {
+    label: "Image Compressor",
+    glyph: <><rect width="18" height="18" x="3" y="3" rx="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></>,
+  },
+  "image-resizer": {
+    label: "Image Resizer",
+    glyph: <><path d="m8 3-5 5 5 5" /><path d="M3 8h12a6 6 0 0 1 6 6v7" /><path d="m16 21 5-5-5-5" /><path d="M21 16H9a6 6 0 0 1-6-6V3" /></>,
+  },
+  "jpg-to-png": {
+    label: "JPG To PNG",
+    glyph: <><rect width="18" height="18" x="3" y="3" rx="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></>,
+  },
+  "png-to-jpg": {
+    label: "PNG To JPG",
+    glyph: <><rect width="18" height="18" x="3" y="3" rx="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></>,
+  },
+  "webp-converter": {
+    label: "WebP Converter",
+    glyph: <><path d="M4 4h16v16H4z" /><path d="m4 16 4-4 3 3 2-2 7 7" /><circle cx="9" cy="9" r="1.5" /></>,
   },
 };
 
