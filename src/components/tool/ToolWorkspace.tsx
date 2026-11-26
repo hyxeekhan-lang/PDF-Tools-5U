@@ -323,6 +323,16 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
       {errors.map((e, i) => (
         <p key={i}>{pick(e)}</p>
       ))}
+      <button
+        type="button"
+        className="mt-2 rounded-full border border-accent/30 px-3 py-1.5 text-xs font-semibold text-accent-dark hover:bg-white/60"
+        onClick={() => {
+          const report = [`PDF Pilot 5U tool: ${tool.name.en}`, `Browser: ${navigator.userAgent}`, `Time: ${new Date().toISOString()}`, '', ...errors.map((e) => pick(e))].join('\n')
+          void navigator.clipboard?.writeText(report)
+        }}
+      >
+        Copy error report
+      </button>
     </div>
   )
 
