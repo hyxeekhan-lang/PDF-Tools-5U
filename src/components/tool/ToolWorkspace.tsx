@@ -62,6 +62,7 @@ import {
   WatermarkOptions,
   AccessibilityCheckerOptions,
   PdfFormCreatorOptions,
+  ImageOptions,
 } from './options'
 
 const aiOptions = (toolSlug: string) => (props: OptionsProps) => <GeminiOptions files={props.files} toolSlug={toolSlug} />
@@ -102,6 +103,11 @@ const OPTIONS: Record<string, (p: OptionsProps) => React.ReactNode> = {
   'extract-tables': PdfToCsvOptions,
   'pdf-accessibility-checker': AccessibilityCheckerOptions,
   'pdf-form-creator': PdfFormCreatorOptions,
+  'image-compressor': ImageOptions,
+  'image-resizer': ImageOptions,
+  'jpg-to-png': ImageOptions,
+  'png-to-jpg': ImageOptions,
+  'webp-converter': ImageOptions,
   'extract-metadata': MetadataOptions,
   'flatten-pdf': FlattenOptions,
   'optimize-pdf': OptimizeOptions,
@@ -153,7 +159,7 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
   const accept = tool.accepts === 'pdf'
     ? 'application/pdf,.pdf'
     : tool.accepts === 'image'
-      ? 'image/jpeg,image/png,.jpg,.jpeg,.png'
+      ? 'image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp'
       : tool.accepts === 'heic'
         ? 'image/heic,image/heif,.heic,.heif'
       : tool.accepts === 'text'
@@ -599,7 +605,7 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
       )}
       <div className={`rounded-card border border-line bg-card p-5 shadow-[var(--shadow-soft)] md:p-7 ${state.phase === 'edit' ? '' : 'hidden'}`}>
         <h2 className="mb-5 font-display text-lg font-bold">{t('page.options')}</h2>
-        {Options && <Options files={files} run={run} />}
+        {Options && <Options files={files} run={run} toolSlug={tool.slug} />}
       </div>
     </div>
   )

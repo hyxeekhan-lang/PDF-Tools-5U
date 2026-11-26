@@ -59,6 +59,7 @@ import {
   splitPdf,
   updateMetadata,
   unlockPdf,
+  processImage,
 } from '#/lib/pdf'
 import { ReorderGrid, SelectGrid } from './PageGrid'
 import { Field, ProcessButton, Segmented, Slider, inputClass } from './controls'
@@ -66,7 +67,29 @@ import { usePdfThumbs } from './usePdfThumbs'
 
 export type Job = (onProgress: Progress) => Promise<Output[]>
 export type RunOptions = { zipAs?: string; compareSize?: number }
-export type OptionsProps = { files: File[]; run: (job: Job, opts?: RunOptions) => void }
+export type OptionsProps = { files: File[]; run: (job: Job, opts?: RunOptions) => void; toolSlug?: string }
+
+export function ImageOptions({ files, run, toolSlug = 'image-compressor' }: OptionsProps) {
+  const { tr } = useI18n()
+  const [quality, setQuality] = useState(75)
+  const [maxWidth, setMaxWidth] = useState(toolSlug === 'image-resizer' ? 1600 : 0)
+  const mode: 'compress' | 'resize' | 'jpg-to-png' | 'png-to-jpg' | 'webp' = toolSlug === 'image-resizer' ? 'resize' : toolSlug === 'jpg-to-png' ? 'jpg-to-png' : toolSlug === 'png-to-jpg' ? 'png-to-jpg' : toolSlug === 'webp-converter' ? 'webp' : 'compress'
+  const label = toolSlug === 'image-resizer' ? 'Resize images' : toolSlug === 'jpg-to-png' ? 'Convert to PNG' : toolSlug === 'png-to-jpg' ? 'Convert to JPG' : toolSlug === 'webp-converter' ? 'Convert to WebP' : 'Compress images'
+  return (
+    <Panel>
+      <p className="text-sm leading-relaxed text-muted">{tr('Images are processed in your browser. Keep the originals and review the downloaded files before sharing.', 'تصاویر آپ کے براؤزر میں پروسیس ہوتی ہیں۔ اصل فائل محفوظ رکھیں۔')}</p>
+      {(mode === 'compress' || mode === 'resize') && <Field label={tr('Maximum width (px, optional)', 'زیادہ سے زیادہ چوڑائی')}><input className={inputClass} type="number" min="0" max="12000" value={maxWidth || ''} placeholder="No resize" onChange={(e) => setMaxWidth(Number(e.target.value) || 0)} /></Field>}
+      {mode !== 'resize' && <Field label={tr(`Quality: ${quality}%`, `کوالٹی: ${quality}%`)}><Slider value={quality} min={10} max={100} step={5} display={`${quality}%`} label="Image quality" onChange={setQuality} /></Field>}
+      <ProcessButton disabled={!files.length} onClick={() => run(async (progress) => {
+        const outputs: Output[] = []
+        for (let i = 0; i < files.length; i++) {
+          outputs.push(...await processImage(files[i], mode, quality, maxWidth, (value, label) => progress((i + value) / files.length, label)))
+        }
+        return outputs
+      }, { zipAs: `${toolSlug}-results.zip` })} label={tr(label, label)} />
+    </Panel>
+  )
+}
 
 function Panel({ children }: { children: React.ReactNode }) {
   return <div className="space-y-6">{children}</div>

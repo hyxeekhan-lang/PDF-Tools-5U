@@ -34,20 +34,21 @@ const toBlob = (bytes: Uint8Array, type = 'application/pdf') => new Blob([bytes 
 
 /* ---------- validation ---------- */
 
-export type FileKind = 'pdf' | 'jpg' | 'png'
+export type FileKind = 'pdf' | 'jpg' | 'png' | 'webp'
 export type AcceptedInput = 'pdf' | 'image' | 'heic' | 'text' | 'docx' | 'xlsx' | 'pptx' | 'html'
 
 async function sniff(file: File): Promise<FileKind | null> {
   const head = new Uint8Array(await file.slice(0, 1024).arrayBuffer())
   if (head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff) return 'jpg'
   if (head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47) return 'png'
+  if (head[0] === 0x52 && head[1] === 0x49 && head[2] === 0x46 && head[3] === 0x46 && head[8] === 0x57 && head[9] === 0x45 && head[10] === 0x42 && head[11] === 0x50) return 'webp'
   const text = new TextDecoder('latin1').decode(head)
   if (text.includes('%PDF-')) return 'pdf'
   return null
 }
 
 const PDF_MIME = ['application/pdf', 'application/x-pdf', '']
-const IMAGE_MIME = ['image/jpeg', 'image/jpg', 'image/pjpeg', 'image/png', '']
+const IMAGE_MIME = ['image/jpeg', 'image/jpg', 'image/pjpeg', 'image/png', 'image/webp', '']
 
 export async function detectKind(file: File): Promise<FileKind | null> {
   return sniff(file)
@@ -95,7 +96,7 @@ export async function validateFile(file: File, accepts: AcceptedInput): Promise<
   if (accepts === 'pdf') {
     if (!mimeOk || kind !== 'pdf')
       throw err(`“${file.name}” is not a valid PDF file.`, `“${file.name}” درست پی ڈی ایف فائل نہیں ہے۔`)
-  } else if (!mimeOk || (kind !== 'jpg' && kind !== 'png')) {
+  } else if (!mimeOk || (kind !== 'jpg' && kind !== 'png' && kind !== 'webp')) {
     throw err(`“${file.name}” is not a JPG or PNG image.`, `“${file.name}” JPG یا PNG تصویر نہیں ہے۔`)
   }
   return kind
@@ -332,10 +333,25 @@ export async function renderPage(page: PDFPageProxy, scale: number, background =
   return { canvas, viewport }
 }
 
-function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality?: number) {
+export function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality?: number) {
   return new Promise<Blob>((resolve, reject) =>
     canvas.toBlob((b) => (b ? resolve(b) : reject(err('Could not encode the image.', 'تصویر نہیں بن سکی۔'))), type, quality),
   )
+}
+
+export async function processImage(file: File, mode: 'compress' | 'resize' | 'jpg-to-png' | 'png-to-jpg' | 'webp', quality: number, maxWidth: number, onProgress: Progress): Promise<Output[]> {
+  const image = await createImageBitmap(file).catch(() => { throw err(`Could not decode “${file.name}”.`, 'تصویر پڑھی نہیں جا سکی۔') })
+  if (image.width * image.height > MAX_CANVAS_PIXELS) { image.close(); throw err('This image is too large to process safely.', 'یہ تصویر بہت بڑی ہے۔') }
+  const scale = maxWidth > 0 ? Math.min(1, maxWidth / image.width) : 1
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.max(1, Math.round(image.width * scale)); canvas.height = Math.max(1, Math.round(image.height * scale))
+  const ctx = canvas.getContext('2d')
+  if (!ctx) { image.close(); throw err('Your browser could not create an image canvas.', 'براؤزر تصویر کا کینوس نہیں بنا سکا۔') }
+  if (mode === 'png-to-jpg') { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height) }
+  ctx.drawImage(image, 0, 0, canvas.width, canvas.height); image.close(); onProgress(0.6, 'Encoding image')
+  const type = mode === 'jpg-to-png' ? 'image/png' : mode === 'webp' ? 'image/webp' : 'image/jpeg'
+  const blob = await canvasToBlob(canvas, type, quality / 100); onProgress(1, 'Finished')
+  return [{ name: `${baseName(file.name)}-${mode}.${type === 'image/jpeg' ? 'jpg' : type.split('/')[1]}`, blob }]
 }
 
 const tick = () => new Promise((r) => setTimeout(r, 0))
