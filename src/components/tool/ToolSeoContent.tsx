@@ -17,6 +17,7 @@ const featureBySlug: Record<string, string[]> = {
   'png-to-jpg': ['Converts PNG files into widely compatible JPG images.', 'Uses a white background where PNG transparency cannot be stored in JPG.', 'Supports batch conversion and individual downloads.'],
   'webp-converter': ['Creates WebP images suitable for modern websites.', 'Accepts common JPG and PNG image inputs.', 'Processes files locally and preserves the source files.'],
   'barcode-maker': ['Generates a Code 39 barcode from supported text.', 'Lets you choose the barcode height before processing.', 'Downloads a scalable SVG barcode for printing or documents.'],
+  'recipe-scanner': ['Reads a recipe card or food label image with Google Gemini after explicit consent.', 'Returns ingredients, steps, servings, timings, and uncertainty in a structured Markdown report.', 'Keeps the original image unchanged and provides a downloadable result.'],
 }
 
 function fileLabel(tool: Tool) {

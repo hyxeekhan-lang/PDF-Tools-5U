@@ -115,6 +115,40 @@ export function BarcodeOptions({ run }: OptionsProps) {
   )
 }
 
+function fileToBase64(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result.replace(/^data:[^;]+;base64,/, '') : '')
+    reader.onerror = () => reject(new Error('Could not read the selected image.'))
+    reader.readAsDataURL(file)
+  })
+}
+
+export function RecipeScannerOptions({ files, run }: OptionsProps) {
+  const { tr } = useI18n()
+  const [consent, setConsent] = useState(false)
+  return <Panel>
+    <p className="text-sm leading-relaxed text-muted">{tr('Recipe Scanner uses Google Gemini to read one food image. Your image is sent only after consent; results may be incomplete and are not medical advice.', 'Recipe Scanner فوڈ تصویر کو Google Gemini سے پڑھتا ہے۔ تصویر اجازت کے بعد بھیجی جاتی ہے؛ نتائج نامکمل ہو سکتے ہیں اور طبی مشورہ نہیں ہیں۔')}</p>
+    <label className="flex items-start gap-3 rounded-xl border border-line bg-paper p-4 text-sm">
+      <input type="checkbox" className="mt-0.5 size-4 accent-accent" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
+      <span>{tr('I agree to send this image to Google Gemini for recipe analysis.', 'میں اس تصویر کو Google Gemini کو بھیجنے کی اجازت دیتا/دیتی ہوں۔')}</span>
+    </label>
+    <ProcessButton disabled={!files.length || !consent} onClick={() => run(async (progress) => {
+      const file = files[0]
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Choose a JPG, PNG, or WebP image.')
+      if (file.size > 9 * 1024 * 1024) throw new Error('For AI scanning, choose an image smaller than 9 MB.')
+      progress(0.2, 'Preparing image for Gemini')
+      const data = await fileToBase64(file)
+      progress(0.45, 'Gemini is reading the recipe')
+      const response = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'recipe-scanner', image: { mimeType: file.type, data } }) })
+      const result = await response.json() as { text?: string; error?: string }
+      if (!response.ok || !result.text) throw new Error(result.error || 'Recipe scanning failed. Try a clearer image.')
+      progress(1, 'Recipe scan complete')
+      return [{ name: 'recipe-scan-result.md', blob: new Blob([result.text], { type: 'text/markdown;charset=utf-8' }) }]
+    })} label={tr('Scan recipe with Gemini', 'Gemini سے recipe scan کریں')} />
+  </Panel>
+}
+
 function Panel({ children }: { children: React.ReactNode }) {
   return <div className="space-y-6">{children}</div>
 }

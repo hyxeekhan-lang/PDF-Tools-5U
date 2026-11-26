@@ -45,6 +45,7 @@ export type Tool = {
 }
 
 export const TOOLS: Tool[] = [
+  { slug: 'recipe-scanner', category: 'ai', status: 'working', icon: ScanText, accepts: 'image', name: { en: 'AI Recipe Scanner', ur: 'AI Recipe Scanner' }, desc: { en: 'Scan a recipe card or food label image with Google Gemini and export a structured recipe summary after your consent.', ur: 'Recipe card یا food label کی تصویر Google Gemini سے پڑھیں اور منظم خلاصہ حاصل کریں۔' }, keywords: ['recipe', 'scanner', 'gemini', 'food', 'ingredients'] },
   {
     slug: 'merge-pdf',
     category: 'organize',

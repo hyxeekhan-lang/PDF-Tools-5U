@@ -4,7 +4,7 @@ import { ToolCard } from './ToolCard'
 
 export function AllTools() {
   const { t } = useI18n()
-  const newTools = LISTED_TOOLS.filter((tool) => tool.slug === 'image-compressor' || tool.slug === 'barcode-maker')
+  const newTools = LISTED_TOOLS.filter((tool) => ['image-compressor', 'barcode-maker', 'recipe-scanner'].includes(tool.slug))
   const categorizedTools = LISTED_TOOLS.filter((tool) => !newTools.some((item) => item.slug === tool.slug))
   return (
     <div className="space-y-14">

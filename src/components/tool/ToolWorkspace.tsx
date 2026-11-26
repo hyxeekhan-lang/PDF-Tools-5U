@@ -64,6 +64,7 @@ import {
   PdfFormCreatorOptions,
   ImageOptions,
   BarcodeOptions,
+  RecipeScannerOptions,
 } from './options'
 
 const aiOptions = (toolSlug: string) => (props: OptionsProps) => <GeminiOptions files={props.files} toolSlug={toolSlug} />
@@ -110,6 +111,7 @@ const OPTIONS: Record<string, (p: OptionsProps) => React.ReactNode> = {
   'png-to-jpg': ImageOptions,
   'webp-converter': ImageOptions,
   'barcode-maker': BarcodeOptions,
+  'recipe-scanner': RecipeScannerOptions,
   'extract-metadata': MetadataOptions,
   'flatten-pdf': FlattenOptions,
   'optimize-pdf': OptimizeOptions,

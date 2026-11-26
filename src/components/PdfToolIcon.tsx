@@ -75,7 +75,8 @@ export type PdfToolIconName =
   "jpg-to-png" |
   "png-to-jpg" |
   "webp-converter" |
-  "barcode-maker";
+  "barcode-maker" |
+  "recipe-scanner";
 
 type IconData = { label: string; glyph: ReactNode };
 
@@ -361,6 +362,10 @@ export const PDF_TOOL_ICONS: Record<PdfToolIconName, IconData> = {
   "barcode-maker": {
     label: "Barcode Maker",
     glyph: <><path d="M4 4v16" /><path d="M7 4v16" /><path d="M11 4v16" /><path d="M14 4v16" /><path d="M18 4v16" /><path d="M21 4v16" /></>,
+  },
+  "recipe-scanner": {
+    label: "AI Recipe Scanner",
+    glyph: <><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M8 8h8M8 12h6M8 16h4" /><circle cx="7" cy="7" r="1" /></>,
   },
 };
 
