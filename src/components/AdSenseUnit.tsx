@@ -11,6 +11,7 @@ const configured = /^pub-\d{16}$/.test(publisherId)
 
 export function AdSenseUnit({ slot }: { slot: 1 | 2 | 3 }) {
   const [allowed, setAllowed] = useState(false)
+  const [scriptReady, setScriptReady] = useState(false)
   const adRef = useRef<HTMLModElement>(null)
   const hasSlot = configured && Boolean(slots[slot])
 
@@ -26,31 +27,37 @@ export function AdSenseUnit({ slot }: { slot: 1 | 2 | 3 }) {
   }, [])
 
   useEffect(() => {
-    if (!allowed || !hasSlot || document.querySelector('script[data-pdfpilot-adsense]')) return
+    if (!allowed || !hasSlot) return
+    const existing = document.querySelector<HTMLScriptElement>('script[data-pdfpilot-adsense]')
+    if (existing) {
+      setScriptReady(true)
+      return
+    }
     const script = document.createElement('script')
     script.async = true
     script.crossOrigin = 'anonymous'
     script.dataset.pdfpilotAdsense = 'true'
     script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}`
+    script.onload = () => setScriptReady(true)
     document.head.appendChild(script)
   }, [allowed, hasSlot])
 
   useEffect(() => {
-    if (!allowed || !hasSlot || !adRef.current) return
+    if (!allowed || !hasSlot || !scriptReady || !adRef.current) return
     try {
       window.adsbygoogle = window.adsbygoogle ?? []
       window.adsbygoogle.push({})
     } catch (error) {
       console.warn('Google AdSense was not ready for this slot.', error)
     }
-  }, [allowed, hasSlot])
+  }, [allowed, hasSlot, scriptReady])
 
   return (
-    <aside className="my-10 flex min-h-24 items-center justify-center overflow-hidden text-center" aria-label="Advertisements">
-      <div>
+    <aside className="my-10 flex min-h-24 w-full min-w-0 items-center justify-center overflow-hidden text-center" aria-label="Advertisements">
+      <div className="w-full min-w-0">
         <span className="mb-2 block text-xs uppercase tracking-wider text-muted">Advertisements</span>
         {hasSlot && allowed ? (
-          <ins ref={adRef} className="adsbygoogle block min-h-24 overflow-hidden" style={{ display: 'block' }} data-ad-client={publisherId} data-ad-slot={slots[slot]} data-ad-format="auto" data-full-width-responsive="true" />
+          <ins ref={adRef} className="adsbygoogle block min-h-24 w-full min-w-[280px] overflow-hidden" style={{ display: 'block' }} data-ad-client={publisherId} data-ad-slot={slots[slot]} data-ad-format="auto" data-full-width-responsive="true" />
         ) : (
           <span className="block text-xs text-muted">Advertisements are disabled until an approved Google AdSense configuration is provided.</span>
         )}
