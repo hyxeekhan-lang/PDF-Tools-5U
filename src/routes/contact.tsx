@@ -24,7 +24,9 @@ function Contact() {
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError('')
-    const data = new FormData(event.currentTarget)
+    setSent(false)
+    const form = event.currentTarget
+    const data = new FormData(form)
     if (!String(data.get('email') ?? '').trim() || !String(data.get('message') ?? '').trim()) {
       setError('Please enter your email address and message.')
       return
@@ -34,7 +36,7 @@ function Contact() {
       const result = await response.json() as { error?: string }
       if (!response.ok) throw new Error(result.error ?? 'Unable to send your message.')
       setSent(true)
-      event.currentTarget.reset()
+      form.reset()
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to send your message. Please email us directly.')
     }
