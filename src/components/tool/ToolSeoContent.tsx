@@ -11,6 +11,12 @@ const featureBySlug: Record<string, string[]> = {
   'pdf-compare': ['Compares selectable text and page counts across two PDFs.', 'Produces a readable comparison report.', 'Clearly excludes visual and image-only differences.'],
   'protect-pdf': ['Encrypts the document with an AES-256 opening password.', 'Processes the file in the browser.', 'Leaves password responsibility with you; lost passwords cannot be recovered.'],
   'unlock-pdf': ['Uses a password you already know to decrypt the PDF.', 'Does not attempt password recovery or bypass protection.', 'Lets you inspect and download the unlocked result locally.'],
+  'image-compressor': ['Compresses JPG, PNG, and WebP images with adjustable quality.', 'Supports selecting multiple images in one browser session.', 'Creates downloadable results without changing the original files.'],
+  'image-resizer': ['Sets a maximum width while preserving image proportions.', 'Processes multiple images with the same size rule.', 'Exports resized images for web, email, or documents.'],
+  'jpg-to-png': ['Converts JPG photos into PNG output files.', 'Processes multiple selected images in one run.', 'Keeps the original image dimensions unless resizing is requested.'],
+  'png-to-jpg': ['Converts PNG files into widely compatible JPG images.', 'Uses a white background where PNG transparency cannot be stored in JPG.', 'Supports batch conversion and individual downloads.'],
+  'webp-converter': ['Creates WebP images suitable for modern websites.', 'Accepts common JPG and PNG image inputs.', 'Processes files locally and preserves the source files.'],
+  'barcode-maker': ['Generates a Code 39 barcode from supported text.', 'Lets you choose the barcode height before processing.', 'Downloads a scalable SVG barcode for printing or documents.'],
 }
 
 function fileLabel(tool: Tool) {
@@ -18,9 +24,10 @@ function fileLabel(tool: Tool) {
 }
 
 export function ToolStepPreview({ tool }: { tool: Tool }) {
+  const barcode = tool.slug === 'barcode-maker'
   const file = fileLabel(tool)
   const steps = [
-    { number: '01', title: 'Upload', body: `Choose ${tool.multiple ? `one or more ${file} files` : `a ${file} file`} from your device.`, art: <UploadArt /> },
+    { number: '01', title: barcode ? 'Enter' : 'Upload', body: barcode ? 'Enter the Code 39 value in the barcode maker.' : `Choose ${tool.multiple ? `one or more ${file} files` : `a ${file} file`} from your device.`, art: <UploadArt /> },
     { number: '02', title: 'Process', body: `Review the preview and options, then run ${tool.name.en}.`, art: <ProcessArt /> },
     { number: '03', title: 'Download', body: 'Inspect the result and save it directly to your device.', art: <DownloadArt /> },
   ]
@@ -44,6 +51,7 @@ export function ToolStepPreview({ tool }: { tool: Tool }) {
 }
 
 export function ToolSeoIntro({ tool }: { tool: Tool }) {
+  const barcode = tool.slug === 'barcode-maker'
   const useCase = tool.category === 'ai'
     ? `Use ${tool.name.en} when you need a focused answer or transformation from selectable PDF text and are comfortable reviewing an AI-generated result.`
     : tool.category === 'convert-to' || tool.category === 'convert-from'
@@ -56,7 +64,7 @@ export function ToolSeoIntro({ tool }: { tool: Tool }) {
         <h2 id="tool-explanation-heading" className="mt-2 font-display text-2xl font-bold">About {tool.name.en}</h2>
         <p className="mt-3 text-lg leading-relaxed text-muted">{tool.desc.en}</p>
         <p className="mt-4 leading-relaxed text-muted">
-          {useCase} Upload {tool.multiple ? `one or more ${fileLabel(tool)} files` : `a ${fileLabel(tool)} file`} using the workspace above, then compare the output with your original before sharing it.
+          {useCase} {barcode ? 'Enter a supported value in the workspace above, create the SVG barcode, and review it before printing or sharing.' : `Upload ${tool.multiple ? `one or more ${fileLabel(tool)} files` : `a ${fileLabel(tool)} file`} using the workspace above, then compare the output with your original before sharing it.`}
         </p>
       </div>
     </section>
@@ -64,6 +72,7 @@ export function ToolSeoIntro({ tool }: { tool: Tool }) {
 }
 
 export function ToolSeoDetails({ tool }: { tool: Tool }) {
+  const barcode = tool.slug === 'barcode-maker'
   const features = featureBySlug[tool.slug] ?? [
     `Works with ${tool.multiple ? 'multiple files when selected together' : `one ${fileLabel(tool)} file at a time`}.`,
     tool.category === 'ai' ? 'Uses extracted text only after you approve the AI request.' : 'Processes the selected file in the browser where supported.',
@@ -99,7 +108,7 @@ export function ToolSeoDetails({ tool }: { tool: Tool }) {
       </section>
       <section className="mt-12 border-t border-line pt-8" aria-labelledby="tool-limitations-heading">
         <div className="flex items-center gap-3"><span className="grid size-11 place-items-center rounded-xl border-2 border-accent text-accent" aria-hidden="true"><svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3 3 7l9 4 9-4-9-4Z" /><path d="m3 12 9 4 9-4M3 17l9 4 9-4" /></svg></span><h2 id="tool-limitations-heading" className="font-display text-2xl font-bold text-accent">Supported formats and limitations</h2></div>
-        <p className="mt-4 rounded-2xl border border-accent/20 bg-blush p-5 leading-relaxed text-muted">Accepted input: {fileLabel(tool)}{tool.multiple ? ' files can be selected together.' : '.'} {tool.desc.en} Large or complex files may depend on available browser memory. Keep the source file and inspect the downloaded output.</p>
+        <p className="mt-4 rounded-2xl border border-accent/20 bg-blush p-5 leading-relaxed text-muted">{barcode ? 'Accepted input: Code 39 text up to 80 characters. Supported values include letters, numbers, spaces, and - . $ / + % symbols. The output is an SVG barcode.' : `Accepted input: ${fileLabel(tool)}${tool.multiple ? ' files can be selected together.' : '.'} ${tool.desc.en} Large or complex files may depend on available browser memory. Keep the source file and inspect the downloaded output.`}</p>
       </section>
       <section className="mt-12 border-t border-line pt-8" aria-labelledby="tool-faq-heading">
         <h2 id="tool-faq-heading" className="font-display text-2xl font-bold">Frequently asked questions</h2>
@@ -110,7 +119,7 @@ export function ToolSeoDetails({ tool }: { tool: Tool }) {
           </details>
           <details className="group py-4">
             <summary className="cursor-pointer font-semibold">What files can I use?</summary>
-            <p className="mt-2 leading-relaxed text-muted">Upload {tool.multiple ? `one or more ${fileLabel(tool)} files` : `one ${fileLabel(tool)} file`} using the existing tool interface. The accepted format and file-size checks are applied before processing.</p>
+            <p className="mt-2 leading-relaxed text-muted">{barcode ? 'Enter supported Code 39 text using the existing tool interface. Unsupported characters are rejected before generation.' : `Upload ${tool.multiple ? `one or more ${fileLabel(tool)} files` : `one ${fileLabel(tool)} file`} using the existing tool interface. The accepted format and file-size checks are applied before processing.`}</p>
           </details>
           <details className="group py-4">
             <summary className="cursor-pointer font-semibold">Where is my file processed?</summary>
