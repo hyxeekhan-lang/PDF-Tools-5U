@@ -149,8 +149,10 @@ export function RecipeScannerOptions({ files, run }: OptionsProps) {
   const [result, setResult] = useState('')
   const [previewUrl, setPreviewUrl] = useState('')
   const [language, setLanguage] = useState<'English' | 'Urdu'>('English')
+  const [lastError, setLastError] = useState('')
   useEffect(() => {
     setResult('')
+    setLastError('')
     if (!files[0]) { setPreviewUrl(''); return }
     const url = URL.createObjectURL(files[0])
     setPreviewUrl(url)
@@ -175,7 +177,8 @@ export function RecipeScannerOptions({ files, run }: OptionsProps) {
       progress(0.45, 'Gemini is reading the recipe')
       const response = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'recipe-scanner', language, image: prepared }) }).catch((error) => { Sentry.captureException(error); throw error })
       const result = await response.json() as { text?: string; error?: string }
-      if (!response.ok || !result.text) throw new Error(result.error || 'Recipe scanning failed. Try a clearer image.')
+      if (!response.ok || !result.text) { setLastError(result.error || 'Recipe scanning failed. Try a clearer image.'); throw new Error(result.error || 'Recipe scanning failed. Try a clearer image.') }
+      setLastError('')
       setResult(result.text)
       progress(1, 'Recipe scan complete')
       const textFile = new File([result.text], 'recipe-scan-result.txt', { type: 'text/plain;charset=utf-8' })
@@ -187,6 +190,7 @@ export function RecipeScannerOptions({ files, run }: OptionsProps) {
       ]
     })} label={tr('Scan recipe with Gemini', 'Gemini سے recipe scan کریں')} />
     {result && <section className="rounded-2xl border border-accent/20 bg-paper p-5" aria-live="polite"><h3 className="font-display text-lg font-bold text-accent">Recipe result</h3><div className="mt-3 whitespace-pre-wrap text-sm leading-7 text-ink">{result}</div><p className="mt-4 text-xs text-muted">Review ingredients and allergen information before relying on this result.</p></section>}
+    {lastError && <div role="alert" className="rounded-xl border border-accent/30 bg-blush px-4 py-3 text-sm text-accent-dark"><p>{lastError}</p><p className="mt-1 text-xs">Check your connection and try again.</p><button type="button" className="mt-3 rounded-full border border-accent px-4 py-2 font-semibold" onClick={() => setLastError('')}>Dismiss and retry</button></div>}
   </Panel>
 }
 
