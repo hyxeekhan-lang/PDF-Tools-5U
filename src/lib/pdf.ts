@@ -369,18 +369,38 @@ export function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality?: 
 }
 
 export async function processImage(file: File, mode: 'compress' | 'resize' | 'jpg-to-png' | 'png-to-jpg' | 'webp', quality: number, maxWidth: number, onProgress: Progress): Promise<Output[]> {
-  const image = await createImageBitmap(file).catch(() => { throw err(`Could not decode “${file.name}”.`, 'تصویر پڑھی نہیں جا سکی۔') })
-  if (image.width * image.height > MAX_CANVAS_PIXELS) { image.close(); throw err('This image is too large to process safely.', 'یہ تصویر بہت بڑی ہے۔') }
+  const image = await decodeImage(file)
+  if (image.width * image.height > MAX_CANVAS_PIXELS) { if ('close' in image) image.close(); throw err('This image is too large to process safely.', 'یہ تصویر بہت بڑی ہے۔') }
   const scale = maxWidth > 0 ? Math.min(1, maxWidth / image.width) : 1
   const canvas = document.createElement('canvas')
   canvas.width = Math.max(1, Math.round(image.width * scale)); canvas.height = Math.max(1, Math.round(image.height * scale))
   const ctx = canvas.getContext('2d')
-  if (!ctx) { image.close(); throw err('Your browser could not create an image canvas.', 'براؤزر تصویر کا کینوس نہیں بنا سکا۔') }
+  if (!ctx) { if ('close' in image) image.close(); throw err('Your browser could not create an image canvas.', 'براؤزر تصویر کا کینوس نہیں بنا سکا۔') }
   if (mode === 'png-to-jpg') { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height) }
-  ctx.drawImage(image, 0, 0, canvas.width, canvas.height); image.close(); onProgress(0.6, 'Encoding image')
+  ctx.drawImage(image, 0, 0, canvas.width, canvas.height); if ('close' in image) image.close(); onProgress(0.6, 'Encoding image')
   const type = mode === 'jpg-to-png' ? 'image/png' : mode === 'webp' ? 'image/webp' : 'image/jpeg'
   const blob = await canvasToBlob(canvas, type, quality / 100); onProgress(1, 'Finished')
   return [{ name: `${baseName(file.name)}-${mode}.${type === 'image/jpeg' ? 'jpg' : type.split('/')[1]}`, blob }]
+}
+
+async function decodeImage(file: File): Promise<ImageBitmap | HTMLImageElement> {
+  if (typeof createImageBitmap === 'function') {
+    try { return await createImageBitmap(file) } catch { /* use the browser image decoder below */ }
+  }
+  const url = URL.createObjectURL(file)
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new Image()
+      element.onload = () => resolve(element)
+      element.onerror = () => reject(new Error('decode'))
+      element.src = url
+    })
+    return image
+  } catch {
+    throw err(`Could not decode “${file.name}”.`, 'تصویر پڑھی نہیں جا سکی۔')
+  } finally {
+    URL.revokeObjectURL(url)
+  }
 }
 
 const tick = () => new Promise((r) => setTimeout(r, 0))
