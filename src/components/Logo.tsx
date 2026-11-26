@@ -1,7 +1,8 @@
 export function LogoMark({ className = 'size-8' }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden>
-      <path d="M9 2.5h11.5L29 11v17.5a2 2 0 0 1-2 2H9a6 6 0 0 1-6-6v-16a6 6 0 0 1 6-6Z" fill="#D92D20" />
+      <defs><linearGradient id="pdfpilot-mark" x1="3" y1="29" x2="31" y2="3" gradientUnits="userSpaceOnUse"><stop stopColor="#B42318" /><stop offset=".52" stopColor="#D92D20" /><stop offset="1" stopColor="#F97066" /></linearGradient></defs>
+      <path d="M9 2.5h11.5L29 11v17.5a2 2 0 0 1-2 2H9a6 6 0 0 1-6-6v-16a6 6 0 0 1 6-6Z" fill="url(#pdfpilot-mark)" />
       <path d="M20.5 2.5V8a3 3 0 0 0 3 3H29L20.5 2.5Z" fill="#FBBF24" />
       <rect x="9" y="13.5" width="14" height="2.4" rx="1.2" fill="#fff" />
       <rect x="9" y="18.2" width="10" height="2.4" rx="1.2" fill="#fff" fillOpacity=".85" />

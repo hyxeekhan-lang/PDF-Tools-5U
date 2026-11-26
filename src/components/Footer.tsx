@@ -92,16 +92,13 @@ export function Footer() {
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-6 text-xs text-muted sm:flex-row lg:px-8">
           <p>© {new Date().getFullYear()} PDF Pilot 5U</p>
-          <a
-            href="https://pdfpilot.site/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Powered by PDF Pilot 5U — visit pdfpilot.site"
+          <Link
+            to="/"
+            aria-label="PDF Pilot 5U home"
             className="inline-flex items-center gap-2 rounded-md transition hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
           >
-            <span>Powered by</span>
             <Logo />
-          </a>
+          </Link>
         </div>
       </div>
     </footer>
