@@ -30,6 +30,35 @@ export function baseName(name: string) {
   return name.replace(/\.[^.]+$/, '') || 'document'
 }
 
+const CODE39: Record<string, string> = {
+  '0':'nnnwwnwnn','1':'wnnwnnnnw','2':'nnwwnnnnw','3':'wnwwnnnnn','4':'nnnwwnnnw','5':'wnnwwnnnn','6':'nnwwwnnnn','7':'nnnwnnwnw','8':'wnnwnnwnn','9':'nnwwnnwnn',
+  'A':'wnnnnwnnw','B':'nnwnnwnnw','C':'wnwnnwnnn','D':'nnnnwwnnw','E':'wnnnwwnnn','F':'nnwnwwnnn','G':'nnnnnwwnw','H':'wnnnnwwnn','I':'nnwnnwwnn','J':'nnnnwwwnn',
+  'K':'wnnnnnnww','L':'nnwnnnnww','M':'wnwnnnnwn','N':'nnnnwnnww','O':'wnnnwnnwn','P':'nnwnwnnwn','Q':'nnnnnnwww','R':'wnnnnnwwn','S':'nnwnnnwwn','T':'nnnnwnwwn',
+  'U':'wwnnnnnnw','V':'nwwnnnnnw','W':'wwwnnnnnn','X':'nwnnwnnnw','Y':'wwnnwnnnn','Z':'nwwnwnnnn','-':'nwnnnnwnw','.':'wwnnnnwnn',' ':'nwwnnnwnn','$':'nwnwnwnnn','/':'nwnwnnnwn','+':'nwnnnwnwn','%':'nnnwnwnwn','*':'nwnnwnwnn',
+}
+
+export function createBarcodeSvg(value: string, height = 120) {
+  const clean = value.toUpperCase().trim()
+  if (!clean || clean.length > 80 || [...clean].some((char) => !CODE39[char] || char === '*')) throw err('Enter up to 80 supported Code 39 characters.', '80 حروف تک Code 39 کی سپورٹڈ ویلیو درج کریں۔')
+  const encoded = `*${clean}*`
+  const narrow = 3
+  const wide = 7
+  const gap = 3
+  let x = 16
+  let bars = ''
+  for (const char of encoded) {
+    const pattern = CODE39[char]
+    for (let i = 0; i < pattern.length; i++) {
+      const width = pattern[i] === 'w' ? wide : narrow
+      if (i % 2 === 0) bars += `<rect x="${x}" y="10" width="${width}" height="${height}"/>`
+      x += width
+    }
+    x += gap
+  }
+  const width = x + 16
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height + 38}" viewBox="0 0 ${width} ${height + 38}" role="img" aria-label="Code 39 barcode"><rect width="100%" height="100%" fill="white"/><g fill="black">${bars}</g><text x="${width / 2}" y="${height + 30}" text-anchor="middle" font-family="Arial,sans-serif" font-size="14">${clean.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</text></svg>`
+}
+
 const toBlob = (bytes: Uint8Array, type = 'application/pdf') => new Blob([bytes as BlobPart], { type })
 
 /* ---------- validation ---------- */

@@ -60,6 +60,7 @@ import {
   updateMetadata,
   unlockPdf,
   processImage,
+  createBarcodeSvg,
 } from '#/lib/pdf'
 import { ReorderGrid, SelectGrid } from './PageGrid'
 import { Field, ProcessButton, Segmented, Slider, inputClass } from './controls'
@@ -87,6 +88,29 @@ export function ImageOptions({ files, run, toolSlug = 'image-compressor' }: Opti
         }
         return outputs
       }, { zipAs: `${toolSlug}-results.zip` })} label={tr(label, label)} />
+    </Panel>
+  )
+}
+
+export function BarcodeOptions({ run }: OptionsProps) {
+  const { tr } = useI18n()
+  const [value, setValue] = useState('PDFPILOT5U')
+  const [height, setHeight] = useState(120)
+  return (
+    <Panel>
+      <Field label={tr('Barcode value (Code 39)', 'بارکوڈ ویلیو (Code 39)')}>
+        <input className={inputClass} value={value} maxLength={80} placeholder="ABC-123" onChange={(e) => setValue(e.target.value.toUpperCase())} />
+      </Field>
+      <Field label={tr(`Bar height: ${height}px`, `بار کی اونچائی: ${height}px`)}>
+        <Slider value={height} min={60} max={240} step={10} display={`${height}px`} label="Barcode height" onChange={setHeight} />
+      </Field>
+      <p className="text-sm leading-relaxed text-muted">{tr('Creates a Code 39 SVG barcode. Use letters, numbers, spaces, and - . $ / + % symbols.', 'Code 39 SVG بارکوڈ بناتا ہے۔')}</p>
+      <ProcessButton disabled={!value.trim()} onClick={() => run(async (progress) => {
+        progress(0.2, 'Creating barcode')
+        const svg = createBarcodeSvg(value, height)
+        progress(1, 'Finished')
+        return [{ name: 'barcode-code39.svg', blob: new Blob([svg], { type: 'image/svg+xml' }) }]
+      })} label={tr('Create barcode', 'بارکوڈ بنائیں')} />
     </Panel>
   )
 }

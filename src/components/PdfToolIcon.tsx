@@ -74,7 +74,8 @@ export type PdfToolIconName =
   "image-resizer" |
   "jpg-to-png" |
   "png-to-jpg" |
-  "webp-converter";
+  "webp-converter" |
+  "barcode-maker";
 
 type IconData = { label: string; glyph: ReactNode };
 
@@ -356,6 +357,10 @@ export const PDF_TOOL_ICONS: Record<PdfToolIconName, IconData> = {
   "webp-converter": {
     label: "WebP Converter",
     glyph: <><path d="M4 4h16v16H4z" /><path d="m4 16 4-4 3 3 2-2 7 7" /><circle cx="9" cy="9" r="1.5" /></>,
+  },
+  "barcode-maker": {
+    label: "Barcode Maker",
+    glyph: <><path d="M4 4v16" /><path d="M7 4v16" /><path d="M11 4v16" /><path d="M14 4v16" /><path d="M18 4v16" /><path d="M21 4v16" /></>,
   },
 };
 

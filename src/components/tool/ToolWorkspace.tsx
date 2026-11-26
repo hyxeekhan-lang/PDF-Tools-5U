@@ -63,6 +63,7 @@ import {
   AccessibilityCheckerOptions,
   PdfFormCreatorOptions,
   ImageOptions,
+  BarcodeOptions,
 } from './options'
 
 const aiOptions = (toolSlug: string) => (props: OptionsProps) => <GeminiOptions files={props.files} toolSlug={toolSlug} />
@@ -108,6 +109,7 @@ const OPTIONS: Record<string, (p: OptionsProps) => React.ReactNode> = {
   'jpg-to-png': ImageOptions,
   'png-to-jpg': ImageOptions,
   'webp-converter': ImageOptions,
+  'barcode-maker': BarcodeOptions,
   'extract-metadata': MetadataOptions,
   'flatten-pdf': FlattenOptions,
   'optimize-pdf': OptimizeOptions,
