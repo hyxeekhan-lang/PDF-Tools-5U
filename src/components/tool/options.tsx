@@ -145,7 +145,17 @@ function fileToBase64(file: File) {
 export function RecipeScannerOptions({ files, run }: OptionsProps) {
   const { tr } = useI18n()
   const [consent, setConsent] = useState(false)
+  const [result, setResult] = useState('')
+  const [previewUrl, setPreviewUrl] = useState('')
+  useEffect(() => {
+    setResult('')
+    if (!files[0]) { setPreviewUrl(''); return }
+    const url = URL.createObjectURL(files[0])
+    setPreviewUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [files])
   return <Panel>
+    {previewUrl && <figure className="overflow-hidden rounded-2xl border border-line bg-paper p-3"><img src={previewUrl} alt="Recipe image preview" className="mx-auto max-h-64 rounded-xl object-contain" /><figcaption className="mt-2 text-center text-xs text-muted">Preview — review the image before sending</figcaption></figure>}
     <p className="text-sm leading-relaxed text-muted">{tr('Recipe Scanner uses Google Gemini to read one food image. Your image is sent only after consent; results may be incomplete and are not medical advice.', 'Recipe Scanner فوڈ تصویر کو Google Gemini سے پڑھتا ہے۔ تصویر اجازت کے بعد بھیجی جاتی ہے؛ نتائج نامکمل ہو سکتے ہیں اور طبی مشورہ نہیں ہیں۔')}</p>
     <label className="flex items-start gap-3 rounded-xl border border-line bg-paper p-4 text-sm">
       <input type="checkbox" className="mt-0.5 size-4 accent-accent" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
@@ -163,9 +173,11 @@ export function RecipeScannerOptions({ files, run }: OptionsProps) {
       const response = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'recipe-scanner', image: prepared }) })
       const result = await response.json() as { text?: string; error?: string }
       if (!response.ok || !result.text) throw new Error(result.error || 'Recipe scanning failed. Try a clearer image.')
+      setResult(result.text)
       progress(1, 'Recipe scan complete')
       return [{ name: 'recipe-scan-result.md', blob: new Blob([result.text], { type: 'text/markdown;charset=utf-8' }) }]
     })} label={tr('Scan recipe with Gemini', 'Gemini سے recipe scan کریں')} />
+    {result && <section className="rounded-2xl border border-accent/20 bg-paper p-5" aria-live="polite"><h3 className="font-display text-lg font-bold text-accent">Recipe result</h3><div className="mt-3 whitespace-pre-wrap text-sm leading-7 text-ink">{result}</div><p className="mt-4 text-xs text-muted">Review ingredients and allergen information before relying on this result.</p></section>}
   </Panel>
 }
 

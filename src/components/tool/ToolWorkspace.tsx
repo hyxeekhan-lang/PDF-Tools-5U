@@ -314,7 +314,7 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
     />
   )
 
-  const cameraPicker = tool.slug === 'scan-to-pdf' ? (
+  const cameraPicker = tool.slug === 'scan-to-pdf' || tool.slug === 'recipe-scanner' ? (
     <input
       ref={cameraInputRef}
       type="file"
@@ -475,13 +475,13 @@ export function ToolWorkspace({ tool }: { tool: Tool }) {
           >
             {tool.multiple ? t('page.uploadMany') : t('page.upload')}
           </button>
-          {tool.slug === 'scan-to-pdf' && (
+          {(tool.slug === 'scan-to-pdf' || tool.slug === 'recipe-scanner') && (
             <button
               type="button"
               onClick={openCamera}
               className="press relative mt-3 inline-flex min-h-12 items-center gap-2 rounded-full border border-accent px-7 font-semibold text-accent hover:bg-blush"
             >
-              <Camera className="size-5" aria-hidden="true" /> Scan with camera
+              <Camera className="size-5" aria-hidden="true" /> {tool.slug === 'recipe-scanner' ? 'Take recipe photo' : 'Scan with camera'}
             </button>
           )}
           <p className="mt-5 flex items-center justify-center gap-1.5 text-xs text-muted">
